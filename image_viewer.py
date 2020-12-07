@@ -61,7 +61,7 @@ class image_viewer(QGraphicsView):
         top_left = self.mapFromScene(self.rect_scene.topLeft())
         bottom_right = self.mapFromScene(self.rect_scene.bottomRight())
         self.rect.setGeometry(QRect(top_left ,bottom_right))
- 
+
     def fit_to_window(self):
         self.zoom = 0
         viewrect = self.viewport().rect()
@@ -126,7 +126,7 @@ class MainWindow(QWidget):
 
         #Load button
         self.load_button = QToolButton(self)
-        self.load_button.setText('Select Directory')
+        self.load_button.setText('Select File/Directory')
         self.load_button.clicked.connect(self.load_dir)
 
         #Coordinates and their labels
@@ -146,10 +146,28 @@ class MainWindow(QWidget):
         self.z = QSpinBox()
         self.z.setMinimum(0)
         self.z.valueChanged.connect(self.load_new_image_z)
+
+        self.z_interval_label = QLabel("Z Interval")
+        self.z_interval = QSpinBox()
+        self.z_interval.setMinimum(1)
+        
+        #Update values based on changes in both the viewer and the spinboxes
         self.viewer.rect_sig.connect(self.update_xy)
+        self.x_min.valueChanged.connect(self.update_rect)
+        self.y_min.valueChanged.connect(self.update_rect)
+        self.x_max.valueChanged.connect(self.update_rect)
+        self.y_max.valueChanged.connect(self.update_rect)
+
+        #Contrast Slider
+        self.slider_label = QLabel("Contrast")
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setMaximum(255)
+
+        #Update on Contrast Change
+        self.slider.valueChanged.connect(self.load_new_image_scroll_bar)
 
         #Scroll bar
-        self.scroll_bar = QScrollBar(self)
+        self.scroll_bar = QSlider(Qt.Horizontal)#QScrollBar(self)
         self.scroll_bar.setOrientation(Qt.Horizontal)
         self.scroll_bar.setMinimum(0)
         self.scroll_bar.setMaximum(0)
@@ -181,6 +199,13 @@ class MainWindow(QWidget):
         HB.addWidget(self.z_label)
         HB.addWidget(self.z)
 
+        HB.addWidget(self.z_interval_label)
+        HB.addWidget(self.z_interval)
+
+        
+        HB.addWidget(self.slider_label)
+        HB.addWidget(self.slider)
+
         layout.addLayout(VB)
         layout.addLayout(HB)
 
@@ -190,6 +215,7 @@ class MainWindow(QWidget):
             self.files = listdir(self.dir)
             self.scroll_bar.setMaximum(len(self.files) - 1)
             self.z.setMaximum(len(self.files) - 1)
+            self.z_interval.setMaximum(len(self.files) - 1)
             self.load_new_image(0)
 
     # Loads a new image from the image library
@@ -201,7 +227,7 @@ class MainWindow(QWidget):
             
             image_data = hdul[0].data
             image_data = image_data / image_data.max()
-            image_data = image_data * 255
+            image_data = (image_data - np.min(image_data)) / (np.max(image_data) - np.min(image_data)) * (255 - self.slider.value())
             image_data = image_data.astype(np.uint8)
 
             hdul.close()
@@ -240,6 +266,13 @@ class MainWindow(QWidget):
         self.y_min.setValue(top_left.y())
         self.x_max.setValue(bottom_right.x())
         self.y_max.setValue(bottom_right.y())
+
+    def update_rect(self):
+        rect_new = QRect(QPoint(self.x_min.value(), self.y_min.value()), QPoint(self.x_max.value(), self.y_max.value()))
+        top_left = self.viewer.mapFromScene(rect_new.topLeft())
+        bottom_right = self.viewer.mapFromScene(rect_new.bottomRight())
+        self.viewer.rect_scene = rect_new
+        self.viewer.update_rect()
         
 
 if __name__ == "__main__":
