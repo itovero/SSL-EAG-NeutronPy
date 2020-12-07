@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+import image_viewer
 
 class Ui_integrated(object):
     def setupUi(self, integrated):
@@ -22,7 +22,7 @@ class Ui_integrated(object):
         self.tabWidget.setObjectName("tabWidget")
 
         #Image Viewer
-        self.tab = QtWidgets.QWidget()
+        self.tab = image_viewer.ImageViewerWindow()
         self.tab.setObjectName("tab")
         self.tabWidget.addTab(self.tab, "")
 

@@ -117,7 +117,7 @@ class image_viewer(QGraphicsView):
         self.update_rect()
         QGraphicsView.resizeEvent(self, event)
     
-class MainWindow(QWidget):
+class ImageViewerWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.viewer = image_viewer()
@@ -275,9 +275,9 @@ class MainWindow(QWidget):
         self.viewer.update_rect()
         
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    w = MainWindow()
-    w.setGeometry(500, 300, 800, 600)
-    w.show()
-    sys.exit(app.exec_())
+#if __name__ == "__main__":
+#    app = QtWidgets.QApplication(sys.argv)
+#    w = MainWindow()
+#    w.setGeometry(500, 300, 800, 600)
+#    w.show()
+#    sys.exit(app.exec_())
