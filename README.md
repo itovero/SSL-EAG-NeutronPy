@@ -1,6 +1,7 @@
-# SSL-EAG-NeutronPy Project Overview
+# SSL-EAG-NeutronPy
 ## SSL EAG Neutron Imaging for Fall 2020 and Spring 2021 
 
+## Project Overview
 Element and/or isotope mapping is done using a neutron beam-line source and
 neutron-counting microchannel plate detector with Timepix electronic readout. High-rate
 simultaneous element-specific imaging creates a 10Gb data stream. Time at the testing site is
