@@ -13,6 +13,9 @@ a tool set. In addition, it is envisioned the toolset could be utilized from hom
 
 ## Team
 **PI**: Anton Tremsin
+
 **Project Management**: Travis Curtis, Nate Darling
+
 **Project Lead**: James Mang
+
 **Development Team**: Diether Delosreyes, Yuki Ito, Tino Trangia, and Paulina Umansky
