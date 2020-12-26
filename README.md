@@ -12,7 +12,7 @@ test parameters and optimize on the fly. The current project is a development ef
 a tool set. In addition, it is envisioned the toolset could be utilized from home or office. This is called NeutronPy
 
 ## Team
-PI: Anton Tremsin
-Project Management: Travis Curtis, Nate Darling
-Project Lead: James Mang
-Development Team: Diether Delosreyes, Yuki Ito, Tino Trangia, and Paulina Umansky
+**PI**: Anton Tremsin
+**Project Management**: Travis Curtis, Nate Darling
+**Project Lead**: James Mang
+**Development Team**: Diether Delosreyes, Yuki Ito, Tino Trangia, and Paulina Umansky
