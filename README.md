@@ -10,3 +10,9 @@ reserved block of time. Given the time constraints, it's very useful to have a r
 visualization software toolset so that the researcher can view data in near real-time to adjust
 test parameters and optimize on the fly. The current project is a development effort for just such
 a tool set. In addition, it is envisioned the toolset could be utilized from home or office. This is called NeutronPy
+
+## Team
+PI: Anton Tremsin
+Project Management: Travis Curtis, Nate Darling
+Project Lead: James Mang
+Development Team: Diether Delosreyes, Yuki Ito, Tino Trangia, and Paulina Umansky
