@@ -114,7 +114,8 @@ class Materials(QtWidgets.QWidget):
             self.pushButton.setObjectName("pushButton")
 
             self.retranslateUi(QtWidgets.QWidget())
-            self.show()
+
+            #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
         def retranslateUi(self, integrated):
             _translate = QtCore.QCoreApplication.translate
@@ -133,8 +134,7 @@ class Materials(QtWidgets.QWidget):
             item = self.tableWidget.horizontalHeaderItem(0)
             item.setText(_translate("integrated", "Element Name"))
             item = self.tableWidget.horizontalHeaderItem(1)
-            item.setText(_translate("integrated", "Isotopic\n"
-    "Abundance"))
+            item.setText(_translate("integrated", "Isotopic Abundance"))
             item = self.tableWidget.horizontalHeaderItem(2)
             item.setText(_translate("integrated", "Atomic Mass"))
             item = self.tableWidget.horizontalHeaderItem(3)

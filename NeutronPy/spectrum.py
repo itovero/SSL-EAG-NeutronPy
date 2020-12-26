@@ -19,7 +19,6 @@ class Spectrum(QtWidgets.QWidget):
 
         self.setGeometry(100, 100, 800, 600)
         self.center()
-        self.setWindowTitle('NeutronPy Spectra Visualization of ' + str(element_name))
 
         grid = QtWidgets.QGridLayout()
         self.setLayout(grid)
@@ -39,7 +38,7 @@ class Spectrum(QtWidgets.QWidget):
         self.canvas = FigureCanvas(self.figure)
         grid.addWidget(self.canvas, 3, 0, 1, 2)
 
-        self.show()
+        #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
     def crossSectionalData(self):
         self.figure.clf()
@@ -134,11 +133,6 @@ def getParameter(self):
 #TODO - import DIETHER's cross_sectional_data -  Theoretically have diether's array be passed for the cross_sectional_data
 
 #use pandas frame
-
-directory, elementTXT = "cross_sectional_data/file_name.txt".split("/", 1) #unnecessary for integration - DIETHER already has a program/ function for this
-element, file_extension = elementTXT.split(".", 1)
-
-element_name = element
 
 if __name__ == "__main__":
     import sys

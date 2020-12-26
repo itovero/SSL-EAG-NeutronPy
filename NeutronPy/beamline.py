@@ -39,13 +39,13 @@ class Beamline(QtWidgets.QWidget):
         self.label_8 = QtWidgets.QLabel(self.groupBox_3)
         self.label_8.setGeometry(QtCore.QRect(180, 190, 71, 16))
         self.label_8.setObjectName("label_8")
-        self.lenght = QtWidgets.QLineEdit(self.groupBox_3)
-        self.lenght.setGeometry(QtCore.QRect(120, 40, 51, 22))
-        self.lenght.setText("15")
-        self.lenght.setObjectName("lenght")
+        self.length = QtWidgets.QLineEdit(self.groupBox_3)
+        self.length.setGeometry(QtCore.QRect(120, 40, 51, 22))
+        self.length.setText("0")
+        self.length.setObjectName("length")
         self.delay = QtWidgets.QLineEdit(self.groupBox_3)
         self.delay.setGeometry(QtCore.QRect(120, 90, 51, 22))
-        self.delay.setText("2")
+        self.delay.setText("0")
         self.delay.setObjectName("delay")
         self.minE = QtWidgets.QLineEdit(self.groupBox_3)
         self.minE.setGeometry(QtCore.QRect(120, 140, 51, 22))
@@ -57,7 +57,8 @@ class Beamline(QtWidgets.QWidget):
         self.maxE.setObjectName("maxE")
 
         self.retranslateUi(QtWidgets.QWidget())
-        self.show()
+
+        #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
     def retranslateUi(self, integrated):
         _translate = QtCore.QCoreApplication.translate
@@ -74,7 +75,7 @@ class Beamline(QtWidgets.QWidget):
 #beam line input backend logic for saving to variables
 def saveInput():
         try:
-            flightPath = float(ui.lenght.text())
+            flightPath = float(ui.length.text())
             delayOnTrigger = float(ui.delay.text())
             minimumEnergyRange = float(ui.minE.text())
             maximumEnergyRange = float(ui.maxE.text())
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     ui = Beamline()
 
     #triggers for beam line input
-    ui.lenght.textChanged['QString'].connect(saveInput)
+    ui.length.textChanged['QString'].connect(saveInput)
     ui.delay.textChanged['QString'].connect(saveInput)
     ui.minE.textChanged['QString'].connect(saveInput)
     ui.maxE.textChanged['QString'].connect(saveInput)

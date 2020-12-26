@@ -1,0 +1,27 @@
+0.6	- 	us, Proton pulse gap PROTON_PULSE_GAP
+14.25192592	-	m,  Flight path FLIGHT_PATH  14.37537871
+2.78868542	-	us, Trigger delay as delivered to detector  3.22933458
+0.480	-	us, Time bin for the experiental data TIME_BIN_EXERIMENTAL_File				
+0.001	-	eV, Minimum E, for which spectra to be calcualted				
+500	-	eV, Maximum E, for which spectra to be calcualted				
+3	-	CROSS_SECT_SKIP_POINTS Number of points to skip in Theoretical Cross section array
+//--------------------------------------------------------------------------------------------
+//
+//FileName	Abundance	AtomicFraction	Density	AtomicMass	"Thickness,um"	GrupN
+//
+// fraction  	- within one group all elements should add up to unity
+// abundance 	- use it if sigma is known for an isotope, but calculation is done for natural element
+// density 	- that should be the density of the entire group matter (e.g. density of metalic glass)
+//
+// AtomicMass	- for one element put mass only for the first isotope, other isotopes should have mass=0!!!!!!!!
+//
+// thickness	- that is the thickness of the entire group, not one element in it
+// GrupN	- used to separate different layers, put elements from same substance in one group, separate layers should have different group numbers
+//
+//------------------------------------------------------------
+Y-nat.txt	1	0.166666667	4.22	39	5000	1
+//------------------------------------------------------------
+V-nat.txt	1	0.166666667	4.22	50.94	5000	1
+//------------------------------------------------------------	
+O-16.txt	1	0.666666667	4.22	16	5000	1
+//------------------------------------------------------------				
