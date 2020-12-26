@@ -1,2 +1,2 @@
-# SSL-EAG-fa20
-SSL EAG Fall2020 
+# SSL-EAG-NeutronPy
+SSL EAG Neutron Imaging for Fall 2020 and Spring 2021 
