@@ -1,5 +1,5 @@
 # NeutronPy 
-## UI created by PyQT5
+UI created by PyQT5
 
 ## How to run the program
 Run the main.py file install any necessary packages using pip or anything for your terminal.
