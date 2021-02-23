@@ -53,12 +53,13 @@ class Spectrum(QtWidgets.QWidget):
         self.canvas.draw_idle()
 
     def AntonCode(self):
+        self.getParameter()
 
         self.figure.clf()
         ax1 = self.figure.add_subplot(211)
 
         x1 = [i for i in range(200)]
-        y1 = [x[0]*x[1]*x[2]*x[3]*x[6]*x[7]*x[8]*x[9] for i in x1]
+        y1 = [x1[0]*x1[1]*x1[2]*x1[3]*x1[6]*x1[7]*x1[8]*x1[9] for i in x1]
 
         ax1.plot(x1, y1, 'b.-')
         ax1.set_title("Experimental Spectrum") #obtained from Diether's experimental data
@@ -89,8 +90,7 @@ class Spectrum(QtWidgets.QWidget):
 def getParameter(self):
     global fullParameters
 
-
-    #TINO - don't mind the float(self.____) part this was for something else
+    
     flightPath = float(self.flightPath.text()) #1 Flight Path: L (meters)
     delayOnTrigger = float(self.delayOnTrigger.text()) #2 Delay on trigger: dT (miliseconds)
     minimumEnergyRange = float(self.minimumEnergyRange.text()) #3 Minimum and Maximum Energy Range (eV)

@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from spectrum import Spectrum
-from beamline import Beamline
+from beamline import Beamline, saveInput
 from materials import Materials
 from image_viewer import ImageViewerWindow
 import os
@@ -33,7 +33,10 @@ class Ui_integrated(object):
         self.tabWidget.addTab(self.tab_3, "")
 
         #Data Visualization
-        fullParameters = []
+
+        #fullParameters = [flightPath, delayOnTrigger, [minE, maxE], [materialParameters (size 6)] 7 by however many elements / isotopes , [cross_sectional_data (size 2)]]
+        fullParameters = [saveInput()]
+        print(fullParameters)
         self.tab_4 = Spectrum(fullParameters)
         self.tab_4.setObjectName("tab_4")
         self.tabWidget.addTab(self.tab_4, "")

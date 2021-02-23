@@ -74,13 +74,18 @@ class Beamline(QtWidgets.QWidget):
 
 #beam line input backend logic for saving to variables
 def saveInput():
-        try:
-            flightPath = float(ui.length.text())
-            delayOnTrigger = float(ui.delay.text())
-            minimumEnergyRange = float(ui.minE.text())
-            maximumEnergyRange = float(ui.maxE.text())
-        except ValueError:
-            print('One of your inputs is not a number')
+    ui = Beamline()
+    def returnInput():
+        return [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
+    try:
+        flightPath = float(ui.length.text())
+        delayOnTrigger = float(ui.delay.text())
+        minimumEnergyRange = float(ui.minE.text())
+        maximumEnergyRange = float(ui.maxE.text())
+        returnInput()
+    except ValueError:
+        print('One of your inputs is not a number')
+        
 
 if __name__ == "__main__":
     import sys
