@@ -17,7 +17,7 @@ class Beamline(QtWidgets.QWidget):
     def initUI(self):
 
         self.groupBox_3 = QtWidgets.QGroupBox(self)
-        self.groupBox_3.setGeometry(QtCore.QRect(10, 20, 280, 241))
+        self.groupBox_3.setGeometry(QtCore.QRect(0, 0, 280, 241))
         self.groupBox_3.setObjectName("groupBox_3")
         self.label = QtWidgets.QLabel(self.groupBox_3)
         self.label.setGeometry(QtCore.QRect(10, 40, 101, 16))

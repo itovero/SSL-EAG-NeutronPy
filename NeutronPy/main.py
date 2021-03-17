@@ -17,14 +17,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("NeutronPy")
 
         layout = QGridLayout()
-        #layout.setColumnStretch(1,3)
         #layout.setColumnStretch(2,3)
+        #layout.setColumnStretch(1,5)
 
 
-        layout.addWidget(Beamline(), 2, 3, 1, 1)
-        layout.addWidget(Beamline(), 2, 2, 1, 1)
-        layout.addWidget(Spectrum(1), 0, 2, 2, 2)
+        layout.addWidget(Beamline(), 0, 4, 1, 1)
+        layout.addWidget(Materials(), 2, 2, 1, 3)
+        layout.addWidget(Spectrum(), 0, 2, 2, 2)
         layout.addWidget(ImageViewerWindow(), 0, 0, 3, 2)
+
+        height = 800
+        width = 1550
+        self.setMinimumSize(width, height)
+
 
         widget = QWidget()
         widget.setLayout(layout)

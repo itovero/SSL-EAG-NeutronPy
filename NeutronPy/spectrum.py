@@ -5,12 +5,9 @@ import matplotlib.figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import pandas as pd
-import numpy as np
-fullParameters = 1
 
 class Spectrum(QtWidgets.QWidget):
-    def __init__(self, fullParameters):
-        self.fullParameters = fullParameters
+    def __init__(self):
 
         super(Spectrum, self).__init__()
         self.initUI()
@@ -43,7 +40,8 @@ class Spectrum(QtWidgets.QWidget):
     def crossSectionalData(self):
         self.figure.clf()
         ax3 = self.figure.add_subplot(111)
-        #Pass Diether's cross sectional data
+        
+        fullParameters = self.getParameter()
 
         x = [i for i in range(100)]
         y = [i**0.5 for i in x]
@@ -53,7 +51,7 @@ class Spectrum(QtWidgets.QWidget):
         self.canvas.draw_idle()
 
     def AntonCode(self):
-        self.getParameter()
+        fullParameters = self.getParameter()
 
         self.figure.clf()
         ax1 = self.figure.add_subplot(211)
@@ -88,15 +86,12 @@ class Spectrum(QtWidgets.QWidget):
 
 
 def getParameter(self):
-    global fullParameters
 
-    
-    flightPath = float(self.flightPath.text()) #1 Flight Path: L (meters)
-    delayOnTrigger = float(self.delayOnTrigger.text()) #2 Delay on trigger: dT (miliseconds)
-    minimumEnergyRange = float(self.minimumEnergyRange.text()) #3 Minimum and Maximum Energy Range (eV)
-    maximumEnergyRange = float(self.maximumEnergyRange.text())
+    flightPath =  0 #1 Flight Path: L (meters)
+    delayOnTrigger = 0 #2 Delay on trigger: dT (miliseconds)
+    minimumEnergyRange = 0 #3 Minimum and Maximum Energy Range (eV)
+    maximumEnergyRange = 0
 
-    #PAULINA - don't mind the float(self.____) part this was for something else
     elementName = ""
     isotopicAbundance = float(self.isotopicAbundance.text()) #value between 0 and 1 (for Ag it is 0.52 and 0.48 for Ag-107 and Ag-109 isotopes)
     atomicFraction = float(self.atomicFraction.text()) #number of 0-1. (e.g. Gd2O3 it is 0.4 for Gd and 0.6 for O)
@@ -116,26 +111,18 @@ def getParameter(self):
     assert thickness > 0
     assert component >= 1
 
+    energyRange = pd.array([minimumEnergyRange, maximumEnergyRange]) #size: 2
+    
+    #IsotopeName	Abundance	AtomicFraction	Density	AtomicMass	"Thickness,um"	GrupN
+    materialParameters = pd.DataFrame([elementName, isotopicAbundance, atomicFraction, density, thickness, component]) #size: 6
+    cross_sectional_data = pd.array([]) #size: 2 - DIETHER
 
+    
+    return flightPath, delayOnTrigger, energyRange, materialParameters, [cross_sectional_data]
 
-    energyRange = np.array([minimumEnergyRange, maximumEnergyRange]) #size: 2
-
-    #IsotopeName	Abundance	AtomicFraction	Density	AtomicMass	"Thickness,um"	GrupN - will be provided by PAULINA
-    materialParameters = np.array([elementName, isotopicAbundance, atomicFraction, density, thickness, component]) #size: 6
-
-
-    cross_sectional_data = np.array([]) #size: 2 - DIETHER
-
-    #fullParameters = [flightPath, delayOnTrigger, [minE, maxE], [materialParameters (size 6)] 7 by however many elements / isotopes , [cross_sectional_data (size 2)]]
-    fullParameters = np.array([flightPath, delayOnTrigger, energyRange, materialParameters, cross_sectional_data]) #size: 5
-
-
-#TODO - import DIETHER's cross_sectional_data -  Theoretically have diether's array be passed for the cross_sectional_data
-
-#use pandas frame
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    ui = Spectrum([])
+    ui = Spectrum()
     sys.exit(app.exec_())
