@@ -85,40 +85,40 @@ class Spectrum(QtWidgets.QWidget):
         self.move(qr.topLeft())
 
 
-def getParameter(self):
+    def getParameter(self):
 
-    flightPath =  0 #1 Flight Path: L (meters)
-    delayOnTrigger = 0 #2 Delay on trigger: dT (miliseconds)
-    minimumEnergyRange = 0 #3 Minimum and Maximum Energy Range (eV)
-    maximumEnergyRange = 0
+        flightPath =  0 #1 Flight Path: L (meters)
+        delayOnTrigger = 0 #2 Delay on trigger: dT (miliseconds)
+        minimumEnergyRange = 0 #3 Minimum and Maximum Energy Range (eV)
+        maximumEnergyRange = 0
 
-    elementName = ""
-    isotopicAbundance = float(self.isotopicAbundance.text()) #value between 0 and 1 (for Ag it is 0.52 and 0.48 for Ag-107 and Ag-109 isotopes)
-    atomicFraction = float(self.atomicFraction.text()) #number of 0-1. (e.g. Gd2O3 it is 0.4 for Gd and 0.6 for O)
-    density = float(self.density.text()) #Rho (g/cm^3)
-    thickness = float(self.density.text()) #d (um)
-    component = int(self.component.text())# integer number starting from 1 (in case there are several different samples in the beam behind each other)
+        elementName = ""
+        isotopicAbundance = float(self.isotopicAbundance.text()) #value between 0 and 1 (for Ag it is 0.52 and 0.48 for Ag-107 and Ag-109 isotopes)
+        atomicFraction = float(self.atomicFraction.text()) #number of 0-1. (e.g. Gd2O3 it is 0.4 for Gd and 0.6 for O)
+        density = float(self.density.text()) #Rho (g/cm^3)
+        thickness = float(self.density.text()) #d (um)
+        component = int(self.component.text())# integer number starting from 1 (in case there are several different samples in the beam behind each other)
 
 
-    #number of assert statements to make sure user input is as desired
-    assert flightPath >= 0
-    assert delayOnTrigger >= 0
-    assert minimumEnergyRange >= 0
-    assert maximumEnergyRange > minimumEnergyRange
-    assert 0 <= isotopicAbundance and isotopicAbundance <= 1
-    assert 0 <= atomicFraction and atomicFraction <= 1
-    assert density > 0
-    assert thickness > 0
-    assert component >= 1
+        #number of assert statements to make sure user input is as desired
+        assert flightPath >= 0
+        assert delayOnTrigger >= 0
+        assert minimumEnergyRange >= 0
+        assert maximumEnergyRange > minimumEnergyRange
+        assert 0 <= isotopicAbundance and isotopicAbundance <= 1
+        assert 0 <= atomicFraction and atomicFraction <= 1
+        assert density > 0
+        assert thickness > 0
+        assert component >= 1
 
-    energyRange = pd.array([minimumEnergyRange, maximumEnergyRange]) #size: 2
-    
-    #IsotopeName	Abundance	AtomicFraction	Density	AtomicMass	"Thickness,um"	GrupN
-    materialParameters = pd.DataFrame([elementName, isotopicAbundance, atomicFraction, density, thickness, component]) #size: 6
-    cross_sectional_data = pd.array([]) #size: 2 - DIETHER
+        energyRange = pd.array([minimumEnergyRange, maximumEnergyRange]) #size: 2
+        
+        #IsotopeName	Abundance	AtomicFraction	Density	AtomicMass	"Thickness,um"	GrupN
+        materialParameters = pd.DataFrame([elementName, isotopicAbundance, atomicFraction, density, thickness, component]) #size: 6
+        cross_sectional_data = pd.array([]) #size: 2 - DIETHER
 
-    
-    return flightPath, delayOnTrigger, energyRange, materialParameters, [cross_sectional_data]
+        
+        return flightPath, delayOnTrigger, energyRange, materialParameters, [cross_sectional_data]
 
 
 if __name__ == "__main__":
