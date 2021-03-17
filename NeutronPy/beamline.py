@@ -1,6 +1,10 @@
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
 
+from PyQt5 import QtCore, QtWidgets, QtGui
+from materials import Materials
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 import pandas as pd
 import numpy as np
 
@@ -55,6 +59,7 @@ class Beamline(QtWidgets.QWidget):
         self.maxE.setGeometry(QtCore.QRect(120, 190, 51, 22))
         self.maxE.setText("0")
         self.maxE.setObjectName("maxE")
+
 
         self.retranslateUi(QtWidgets.QWidget())
 

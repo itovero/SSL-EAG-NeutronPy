@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import pandas as pd
 import numpy as np
-
+fullParameters = 1
 
 class Spectrum(QtWidgets.QWidget):
     def __init__(self, fullParameters):

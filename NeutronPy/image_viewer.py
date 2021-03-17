@@ -174,11 +174,11 @@ class ImageViewerWindow(QWidget):
         self.scroll_bar.valueChanged.connect(self.load_new_image_scroll_bar)
 
         #Add the image viewer and scroll bar
-        layout = QHBoxLayout(self)
+        layout = QVBoxLayout(self)
         VB = QVBoxLayout(self)
         VB.addWidget(self.viewer)
         VB.addWidget(self.scroll_bar)
-
+ 
         #Add the coordinates and the get file button
         HB = QVBoxLayout(self)
         HB.setAlignment(Qt.AlignLeft)
@@ -208,6 +208,7 @@ class ImageViewerWindow(QWidget):
 
         layout.addLayout(VB)
         layout.addLayout(HB)
+
 
     def load_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
@@ -274,9 +275,10 @@ class ImageViewerWindow(QWidget):
         self.viewer.rect_scene = rect_new
         self.viewer.update_rect()
 
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = ImageViewerWindow()
-    w.setGeometry(500, 300, 800, 600)
+    w.setGeometry(0, 0, 800, 600)
     w.show()
     sys.exit(app.exec_())
