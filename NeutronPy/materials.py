@@ -219,20 +219,19 @@ class Materials(QtWidgets.QWidget):
     def saveInput(self):
         rows = self.tableWidget.rowCount()
         columns = self.tableWidget.columnCount()
-        
         new_frame = pd.DataFrame(index=range(rows))
-
         for i in range(rows):
             for j in range(columns):
                 text = self.tableWidget.item(i,j).text()
                 try:
                     value = float(text)
                 except:
-                    value = 'NaN'
+                    if j == 0 :
+                        value = text
+                    else:
+                        value = 'NaN'
                 new_frame.loc[i, j] = value
-
         print(new_frame)
-
         return new_frame
 
 if __name__ == "__main__":
