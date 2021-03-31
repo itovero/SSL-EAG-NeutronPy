@@ -11,21 +11,34 @@ from materials import Materials
 
 class Spectrum(QtWidgets.QWidget):
     def __init__(self, beamline, materials, imageviewer):
+        '''
+        The Spectrum takes in the instances of beamline, materials, and 
+        imageviewer created in main.py. This is to track the variables of inputs
+        to be reflected to the spectrum
+        '''
         self.beamline = beamline
         self.materials = materials
         self.imageviewer = imageviewer
+
+
         super(Spectrum, self).__init__()
         self.initUI()
 
     def initUI(self):
-
+        '''
+        The UI initialization
+        '''
         self.setGeometry(100, 100, 800, 600)
         self.center()
 
         grid = QtWidgets.QGridLayout()
         self.setLayout(grid)
 
-
+        '''
+        Creating buttons to generate the plots.
+        We connect the pressing of the buttons to crossSectionalData 
+        and AntonCode function for plotting
+        '''
         btn1 = QtWidgets.QPushButton('Plot 1: Cross Section (MeV vs Barns) ', self)
         btn1.resize(btn1.sizeHint())
         btn1.clicked.connect(self.crossSectionalData)
@@ -43,23 +56,40 @@ class Spectrum(QtWidgets.QWidget):
         #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
     def crossSectionalData(self):
+        '''
+        Obtaining the updated parameter inputs from beamline, materials, 
+        and imageviewer
+        '''
         fullParameters = self.getUpdatedParameters()
 
         self.figure.clf()
         ax3 = self.figure.add_subplot(111)
         
+        '''
+        The plotting function itself
+        '''
         x = [i for i in range(100)]
         y = [i**(fullParameters[0] + fullParameters[1]) for i in x]
+        
+        
         ax3.plot(x, y, 'r.-')
         ax3.set_title('Cross Section (MeV vs Barns)')
         self.canvas.draw_idle()
 
     def AntonCode(self):
+        '''
+        Obtaining the updated parameter inputs from beamline, materials, 
+        and imageviewer
+        '''
         fullParameters = self.getUpdatedParameters()
 
         self.figure.clf()
         ax1 = self.figure.add_subplot(211)
 
+        '''
+        The plotting function(s) itself (QuickFit)
+        As we are plotting multiple functions in one graph
+        '''    
         x1 = [i for i in range(200)]
         y1 = [x1[0]*x1[1]*x1[2]*x1[3]*x1[6]*x1[7]*x1[8]*x1[9] for i in x1]
 
@@ -90,6 +120,12 @@ class Spectrum(QtWidgets.QWidget):
 
 
     def getUpdatedParameters(self):
+        '''
+        Function that obtains the updated inputs from beamline, materials,
+        and image viewer. We call the saveInput functions for all these instances
+        and that is converted into an array called fullParameters above
+        '''
+        
         beamlineInput = self.beamline.saveInput()
         #beamlineInput = [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
 
