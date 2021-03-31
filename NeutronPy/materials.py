@@ -121,7 +121,7 @@ class Materials(QtWidgets.QWidget):
         item = self.tableWidget.verticalHeaderItem(0)
         item.setText(_translate("integrated", "Material 1"))
         item = self.tableWidget.verticalHeaderItem(1)
-        item.setText(_translate("integrated", "Material 4"))
+        item.setText(_translate("integrated", "Material 2"))
         item = self.tableWidget.verticalHeaderItem(2)
         item.setText(_translate("integrated", "Material 3"))
         item = self.tableWidget.verticalHeaderItem(3)

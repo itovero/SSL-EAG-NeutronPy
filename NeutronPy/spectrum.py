@@ -125,22 +125,28 @@ class Spectrum(QtWidgets.QWidget):
         and image viewer. We call the saveInput functions for all these instances
         and that is converted into an array called fullParameters above
         '''
-        
+
         beamlineInput = self.beamline.saveInput()
         #beamlineInput = [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
 
         self.flightPath =  beamlineInput[0] #1 Flight Path: L (meters)
         self.delayOnTrigger = beamlineInput[1] #2 Delay on trigger: dT (miliseconds)
         self.energyRange = beamlineInput[2] #3 Minimum and Maximum Energy Range (eV)
+        
+        self.materialsInput = self.materials.saveInput()
+        #materialsInput is a pandas frame with the structure shown below:
+        '''
+                    Element Name | Abundance | Atomic Mass | Atomic Fraction | Density | Thickness | Component 
+        Material 1
+        Material 2
+        Material 3
+        Material 4
+        Material 5
+        '''
+        #where you can access the inputs by selecting the coordinates (e.g. materialsInput[0, 1] would return Materials 1's abundance)
+        #Note that not all 5 materials are used, for this instance the frame is entered 'NaN'
+        
         """
-        elementName = ""
-        isotopicAbundance = float(self.isotopicAbundance.text()) #value between 0 and 1 (for Ag it is 0.52 and 0.48 for Ag-107 and Ag-109 isotopes)
-        atomicFraction = float(self.atomicFraction.text()) #number of 0-1. (e.g. Gd2O3 it is 0.4 for Gd and 0.6 for O)
-        density = float(self.density.text()) #Rho (g/cm^3)
-        thickness = float(self.density.text()) #d (um)
-        component = int(self.component.text())# integer number starting from 1 (in case there are several different samples in the beam behind each other)
-
-
         #number of assert statements to make sure user input is as desired
         assert flightPath >= 0
         assert delayOnTrigger >= 0
@@ -161,7 +167,7 @@ class Spectrum(QtWidgets.QWidget):
         
         return flightPath, delayOnTrigger, energyRange, materialParameters, [cross_sectional_data]
         """
-        return [self.flightPath, self.delayOnTrigger, self.energyRange]
+        return [self.flightPath, self.delayOnTrigger, self.energyRange, self.materialsInput]
 
 if __name__ == "__main__":
     import sys
