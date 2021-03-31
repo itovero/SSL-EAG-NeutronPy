@@ -62,7 +62,7 @@ class Beamline(QtWidgets.QWidget):
 
         self.retranslateUi(QtWidgets.QWidget())
         self.pushButton = QtWidgets.QPushButton(self)
-        self.pushButton.setGeometry(QtCore.QRect(860, 330, 93, 28))
+        self.pushButton.setGeometry(QtCore.QRect(120, 230, 93, 28))
         self.pushButton.setObjectName("pushButton")
         self.pushButton.clicked.connect(self.saveInput)
         self.show()
