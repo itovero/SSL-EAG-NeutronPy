@@ -20,14 +20,15 @@ class MainWindow(QtWidgets.QMainWindow):
         #layout.setColumnStretch(2,3)
         #layout.setColumnStretch(1,5)
 
-        B = Beamline()
-        S = Spectrum()
+        beamline = Beamline()
+        materials = Materials()
+        spectrum = Spectrum()
+        imageviewer = ImageViewerWindow()
 
-
-        layout.addWidget(B, 0, 4, 1, 1)
-        layout.addWidget(Materials(), 2, 2, 1, 3)
-        layout.addWidget(S, 0, 2, 2, 2)
-        layout.addWidget(ImageViewerWindow(), 0, 0, 3, 2)
+        layout.addWidget(beamline, 0, 4, 1, 1)
+        layout.addWidget(materials, 2, 2, 1, 3)
+        layout.addWidget(spectrum, 0, 2, 2, 2)
+        layout.addWidget(imageviewer, 0, 0, 3, 2)
 
         height = 800
         width = 1550
