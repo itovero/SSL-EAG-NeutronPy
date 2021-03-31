@@ -6,10 +6,14 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import pandas as pd
 from beamline import Beamline
+from image_viewer import ImageViewerWindow
+from materials import Materials
 
 class Spectrum(QtWidgets.QWidget):
-    def __init__(self):
-
+    def __init__(self, beamline, materials, imageviewer):
+        self.beamline = beamline
+        self.materials = materials
+        self.imageviewer = imageviewer
         super(Spectrum, self).__init__()
         self.initUI()
 
@@ -38,16 +42,14 @@ class Spectrum(QtWidgets.QWidget):
 
         #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
-    def crossSectionalData(self, a):
+    def crossSectionalData(self):
+        fullParameters = self.getParameter()
+
         self.figure.clf()
         ax3 = self.figure.add_subplot(111)
         
-        #fullParameters = self.getParameter()
-
         x = [i for i in range(100)]
-        y = [i**0.5 for i in x]
-
-        print(a)
+        y = [i**(fullParameters[0] + fullParameters[1]) for i in x]
         ax3.plot(x, y, 'r.-')
         ax3.set_title('Cross Section (MeV vs Barns)')
         self.canvas.draw_idle()
@@ -88,12 +90,13 @@ class Spectrum(QtWidgets.QWidget):
 
 
     def getParameter(self):
+        beamlineInput = self.beamline.saveInput()
+        #beamlineInput = [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
 
-        flightPath =  0 #1 Flight Path: L (meters)
-        delayOnTrigger = 0 #2 Delay on trigger: dT (miliseconds)
-        minimumEnergyRange = 0 #3 Minimum and Maximum Energy Range (eV)
-        maximumEnergyRange = 0
-
+        self.flightPath =  beamlineInput[0] #1 Flight Path: L (meters)
+        self.delayOnTrigger = beamlineInput[1] #2 Delay on trigger: dT (miliseconds)
+        self.energyRange = beamlineInput[2] #3 Minimum and Maximum Energy Range (eV)
+        """
         elementName = ""
         isotopicAbundance = float(self.isotopicAbundance.text()) #value between 0 and 1 (for Ag it is 0.52 and 0.48 for Ag-107 and Ag-109 isotopes)
         atomicFraction = float(self.atomicFraction.text()) #number of 0-1. (e.g. Gd2O3 it is 0.4 for Gd and 0.6 for O)
@@ -121,7 +124,8 @@ class Spectrum(QtWidgets.QWidget):
 
         
         return flightPath, delayOnTrigger, energyRange, materialParameters, [cross_sectional_data]
-
+        """
+        return [self.flightPath, self.delayOnTrigger, self.energyRange]
 
 if __name__ == "__main__":
     import sys
