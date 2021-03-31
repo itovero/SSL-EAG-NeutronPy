@@ -22,8 +22,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         beamline = Beamline()
         materials = Materials()
-        spectrum = Spectrum()
         imageviewer = ImageViewerWindow()
+        spectrum = Spectrum(beamline, materials, imageviewer)
 
         layout.addWidget(beamline, 0, 4, 1, 1)
         layout.addWidget(materials, 2, 2, 1, 3)
