@@ -60,7 +60,8 @@ class Beamline(QtWidgets.QWidget):
         self.maxE.setText("0")
         self.maxE.setObjectName("maxE")
 
-        '''self.retranslateUi(QtWidgets.QWidget())
+        self.retranslateUi(QtWidgets.QWidget())
+        '''
         self.pushButton = QtWidgets.QPushButton(self)
         self.pushButton.setGeometry(QtCore.QRect(120, 230, 93, 28))
         self.pushButton.setObjectName("pushButton")
