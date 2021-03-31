@@ -43,7 +43,7 @@ class Spectrum(QtWidgets.QWidget):
         #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
     def crossSectionalData(self):
-        fullParameters = self.getParameter()
+        fullParameters = self.getUpdatedParameters()
 
         self.figure.clf()
         ax3 = self.figure.add_subplot(111)
@@ -55,7 +55,7 @@ class Spectrum(QtWidgets.QWidget):
         self.canvas.draw_idle()
 
     def AntonCode(self):
-        fullParameters = self.getParameter()
+        fullParameters = self.getUpdatedParameters()
 
         self.figure.clf()
         ax1 = self.figure.add_subplot(211)
@@ -89,7 +89,7 @@ class Spectrum(QtWidgets.QWidget):
         self.move(qr.topLeft())
 
 
-    def getParameter(self):
+    def getUpdatedParameters(self):
         beamlineInput = self.beamline.saveInput()
         #beamlineInput = [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
 
