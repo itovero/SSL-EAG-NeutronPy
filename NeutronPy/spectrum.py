@@ -5,6 +5,7 @@ import matplotlib.figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import pandas as pd
+from beamline import Beamline
 
 class Spectrum(QtWidgets.QWidget):
     def __init__(self):
@@ -37,15 +38,16 @@ class Spectrum(QtWidgets.QWidget):
 
         #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
-    def crossSectionalData(self):
+    def crossSectionalData(self, a):
         self.figure.clf()
         ax3 = self.figure.add_subplot(111)
         
-        fullParameters = self.getParameter()
+        #fullParameters = self.getParameter()
 
         x = [i for i in range(100)]
         y = [i**0.5 for i in x]
 
+        print(a)
         ax3.plot(x, y, 'r.-')
         ax3.set_title('Cross Section (MeV vs Barns)')
         self.canvas.draw_idle()

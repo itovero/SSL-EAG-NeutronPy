@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from spectrum import Spectrum
-from beamline import Beamline, saveInput
+from beamline import Beamline
 from materials import Materials
 from image_viewer import ImageViewerWindow
 import os
@@ -20,10 +20,13 @@ class MainWindow(QtWidgets.QMainWindow):
         #layout.setColumnStretch(2,3)
         #layout.setColumnStretch(1,5)
 
+        B = Beamline()
+        S = Spectrum()
 
-        layout.addWidget(Beamline(), 0, 4, 1, 1)
+
+        layout.addWidget(B, 0, 4, 1, 1)
         layout.addWidget(Materials(), 2, 2, 1, 3)
-        layout.addWidget(Spectrum(), 0, 2, 2, 2)
+        layout.addWidget(S, 0, 2, 2, 2)
         layout.addWidget(ImageViewerWindow(), 0, 0, 3, 2)
 
         height = 800
@@ -34,6 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
+        #print(Beamline().maxE.text())
 
 if __name__ == "__main__":
     import sys

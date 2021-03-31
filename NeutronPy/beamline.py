@@ -60,10 +60,23 @@ class Beamline(QtWidgets.QWidget):
         self.maxE.setText("0")
         self.maxE.setObjectName("maxE")
 
-
         self.retranslateUi(QtWidgets.QWidget())
+        self.pushButton = QtWidgets.QPushButton(self)
+        self.pushButton.setGeometry(QtCore.QRect(860, 330, 93, 28))
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton.clicked.connect(self.saveInput)
+        self.show()
 
-        #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
+    def saveInput(self):
+        try:
+            flightPath = float(self.length.text())
+            delayOnTrigger = float(self.delay.text())
+            minimumEnergyRange = float(self.minE.text())
+            maximumEnergyRange = float(self.maxE.text())
+            print([flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]])
+            return [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
+        except ValueError:
+            print('One of your inputs is not a number')
 
     def retranslateUi(self, integrated):
         _translate = QtCore.QCoreApplication.translate
@@ -76,30 +89,10 @@ class Beamline(QtWidgets.QWidget):
         self.label_6.setText(_translate("deliverable", "milliseconds"))
         self.label_7.setText(_translate("deliverable", "electronvolt"))
         self.label_8.setText(_translate("deliverable", "electronvolt"))
-
-#beam line input backend logic for saving to variables
-def saveInput():
-    ui = Beamline()
-    def returnInput():
-        return [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
-    try:
-        flightPath = float(ui.length.text())
-        delayOnTrigger = float(ui.delay.text())
-        minimumEnergyRange = float(ui.minE.text())
-        maximumEnergyRange = float(ui.maxE.text())
-        returnInput()
-    except ValueError:
-        print('One of your inputs is not a number')
         
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = Beamline()
-
-    #triggers for beam line input
-    ui.length.textChanged['QString'].connect(saveInput)
-    ui.delay.textChanged['QString'].connect(saveInput)
-    ui.minE.textChanged['QString'].connect(saveInput)
-    ui.maxE.textChanged['QString'].connect(saveInput)
     sys.exit(app.exec_())
