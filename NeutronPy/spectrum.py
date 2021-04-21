@@ -68,8 +68,8 @@ class Spectrum(QtWidgets.QWidget):
         '''
         The plotting function itself
         '''
-        x = [i for i in range(100)]
-        y = [2 for i in x]
+        x = [i for i in range(0, len(self.imageviewer.files) - 1)] #len(self.imageviewer.files)
+        y = [self.sum_image_data[i] for i in x]
         
         
         ax3.plot(x, y, 'r.-')
@@ -126,7 +126,7 @@ class Spectrum(QtWidgets.QWidget):
         and that is converted into an array called fullParameters above
         '''
         self.imageviewerInput = self.imageviewer.saveInput()
-        #imageviwerInput = [[xmin, xmax], [ymin, ymax], z]
+        #imageviwerInput = [[xmin, xmax], [ymin, ymax], z, sum_image_data]
 
 
         self.xmin = self.imageviewerInput[0][0]
@@ -134,6 +134,7 @@ class Spectrum(QtWidgets.QWidget):
         self.ymin = self.imageviewerInput[1][0]
         self.ymax = self.imageviewerInput[1][1]
         self.z = self.imageviewerInput[2]
+        self.sum_image_data = self.imageviewerInput[3]
 
 
 

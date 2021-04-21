@@ -220,7 +220,7 @@ class ImageViewerWindow(QWidget):
             self.load_new_image(0)
 
     # Loads a new image from the image library
-    def load_new_image(self, value):
+    def load_new_image(self, value, x = [], y = [], z_step = 1):
         if self.files != None:
             filename = self.dir + '/' + self.files[value]
 
@@ -245,6 +245,14 @@ class ImageViewerWindow(QWidget):
             self.y_min.setMaximum(bottom_right.y())
             self.x_max.setMaximum(bottom_right.x())
             self.y_max.setMaximum(bottom_right.y())
+
+            #Summing each pixel for a given x, y array
+            if x != [] and y != []:
+                ymin, ymax = y[0], y[1]
+                xmin, xmax = x[0], x[1]
+                subsection_values = image_data[ymin:ymax, xmin:xmax]
+                return np.sum(subsection_values)
+
 
     # Changed the value of  z to obtain next image
     def load_new_image_z(self):
@@ -293,11 +301,16 @@ class ImageViewerWindow(QWidget):
             ymax = float(bottom_right.y())
             """
             z = float(self.scroll_bar.value()) #z doesn't update manually through inputting
+            #TODO update z_step
             xmin, xmax, ymin, ymax = self.update_rect()
+            sum_image_data = np.zeros(len(self.files) - 1)
+            for i in range(0, len(sum_image_data) - 1): #len(sum_image_data)
+                sum_image_data[i] = self.load_new_image(i, [xmin, xmax], [ymin, ymax])
+
             print("xmin: " + str(xmin) + " xmax: " + str(xmax))
             print("ymin: " + str(ymin) + " ymax: " + str(ymax))
             print("z: " + str(z))
-            return [[xmin, xmax], [ymin, ymax], z]
+            return [[xmin, xmax], [ymin, ymax], z, sum_image_data]
         except ValueError:
             print('One of your inputs is not a number')
 
