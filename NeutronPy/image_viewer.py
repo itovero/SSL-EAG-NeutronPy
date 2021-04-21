@@ -143,12 +143,15 @@ class ImageViewerWindow(QWidget):
         self.y_max = QSpinBox()
 
         self.z_label = QLabel("Z")
-        self.z = QSpinBox()
+        self.z = QSpinBox() #TODO: The spinbox for the z value does not seem to update; the z-scrollbar works though
         self.z.setMinimum(0)
         self.z.valueChanged.connect(self.load_new_image_z)
 
         self.z_interval_label = QLabel("Z Interval")
-        self.z_interval = QSpinBox()
+        self.z_interval = QSpinBox() #TODO: There seems to be no implementation of the z-intervals in the codebase of imageviewer at the moment
+                                     # If someone ever wants to add this feature, we can pass the new z-interval through the image_cube and have it use the command image_cube[::z_interval]
+                                     # of sorts to implement (a.k.a it should be pretty straight forward to implement)
+        
         self.z_interval.setMinimum(1)
 
         #Update values based on changes in both the viewer and the spinboxes
@@ -212,15 +215,31 @@ class ImageViewerWindow(QWidget):
 
     def load_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
-        if dir != '': #TODO Fix the FileNotFoundError when clicking cancel
+
+        #TODO Fix the FileNotFoundError when clicking cancel
+        if dir != '': 
             self.files = listdir(self.dir)
+
+            #loads every image file in the directory into an image cube containing information
+            #on each pixel of each slice of data
+
+            #TODO: This part precisely is where all the long loading takes every time
+            #       you are trying to open up a new data set - therefore optimizing this
+            #       would be great for future implementation
+
+            #For debugging, looking at the load_new_images method will be helpful as abstractions
+            #are omitted for this list comprehension to maintain fastest runtime
+            self.image_cube = np.array([fits.open(self.dir + '/' + self.files[fileNum])[0].data for fileNum in range(0, len(self.files) - 1)])
+
             self.scroll_bar.setMaximum(len(self.files) - 1)
             self.z.setMaximum(len(self.files) - 1)
             self.z_interval.setMaximum(len(self.files) - 1)
             self.load_new_image(0)
 
     # Loads a new image from the image library
-    def load_new_image(self, value, x = [], y = [], z_step = 1):
+    #   This load_new_image is only for the image viewing purposes - it only loads and 
+    #   shows one slice each for optimizing runtime while scrolling the z-bar
+    def load_new_image(self, value):
         if self.files != None:
             filename = self.dir + '/' + self.files[value]
 
@@ -246,14 +265,6 @@ class ImageViewerWindow(QWidget):
             self.x_max.setMaximum(bottom_right.x())
             self.y_max.setMaximum(bottom_right.y())
 
-            #Summing each pixel for a given x, y array
-            if x != [] and y != []:
-                ymin, ymax = y[0], y[1]
-                xmin, xmax = x[0], x[1]
-                subsection_values = image_data[ymin:ymax, xmin:xmax]
-                return np.sum(subsection_values)
-
-
     # Changed the value of  z to obtain next image
     def load_new_image_z(self):
         value = self.z.value()
@@ -275,7 +286,6 @@ class ImageViewerWindow(QWidget):
         self.y_min.setValue(top_left.y())
         self.x_max.setValue(bottom_right.x())
         self.y_max.setValue(bottom_right.y())
-        #return [top_left.x(), top_left.y(), bottom_right.x(), bottom_right.y()]
 
     def update_rect(self):
         rect_new = QRect(QPoint(self.x_min.value(), self.y_min.value()), QPoint(self.x_max.value(), self.y_max.value()))
@@ -288,31 +298,30 @@ class ImageViewerWindow(QWidget):
 
     #Save Input function for main.py integration
     def saveInput(self):
-        """
-        top_left = self.viewer.mapToScene(rect.topLeft())
-        bottom_right = self.viewer.mapToScene(rect.bottomRight())
-        """
 
         try:
-            """
-            xmin = float(top_left.x())
-            xmax = float(bottom_right.x())
-            ymin = float(top_left.y())
-            ymax = float(bottom_right.y())
-            """
-            z = float(self.scroll_bar.value()) #z doesn't update manually through inputting
-            #TODO update z_step
+            #z : SliceNum
+            z = float(self.scroll_bar.value())
+            
+            #TODO implement z_interval into saveInput
+            #z_interval = ....
+            
+            #xmin, xmax are the x coordinates of the rectangle user selected; same goes for y
             xmin, xmax, ymin, ymax = self.update_rect()
-            sum_image_data = np.zeros(len(self.files) - 1)
-            for i in range(0, len(sum_image_data) - 1): #len(sum_image_data)
-                sum_image_data[i] = self.load_new_image(i, [xmin, xmax], [ymin, ymax])
 
+            #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
+            sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
+            
+            #These print statements are here for whenever you want to see if the inputs are actually updating when you click on the plots in spectrum
+            #Can comment out if needed
             print("xmin: " + str(xmin) + " xmax: " + str(xmax))
             print("ymin: " + str(ymin) + " ymax: " + str(ymax))
             print("z: " + str(z))
-            return [[xmin, xmax], [ymin, ymax], z, sum_image_data]
+            return [[xmin, xmax], [ymin, ymax], z, sumImageCube]
         except ValueError:
             print('One of your inputs is not a number')
+
+
 
 
 if __name__ == "__main__":

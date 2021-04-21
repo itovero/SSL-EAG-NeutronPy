@@ -60,8 +60,11 @@ class Spectrum(QtWidgets.QWidget):
         Obtaining the updated parameter inputs from beamline, materials, 
         and imageviewer
         '''
-        fullParameters = self.getUpdatedParameters()
+        self.getUpdatedParameters()
 
+        '''
+        Plotting initialization
+        '''
         self.figure.clf()
         ax3 = self.figure.add_subplot(111)
         
@@ -81,8 +84,11 @@ class Spectrum(QtWidgets.QWidget):
         Obtaining the updated parameter inputs from beamline, materials, 
         and imageviewer
         '''
-        fullParameters = self.getUpdatedParameters()
+        self.getUpdatedParameters()
 
+        '''
+        Plotting initialization - there will be 2 graphs on the window
+        '''
         self.figure.clf()
         ax1 = self.figure.add_subplot(211)
 
@@ -90,11 +96,12 @@ class Spectrum(QtWidgets.QWidget):
         The plotting function(s) itself (QuickFit)
         As we are plotting multiple functions in one graph
         '''    
+        #TODO: Implemenet Anton's codebase onto the graph using sum_image_data
         x1 = [i for i in range(200)]
         y1 = [2 for i in x1]
 
         ax1.plot(x1, y1, 'b.-')
-        ax1.set_title("Experimental Spectrum") #obtained from Diether's experimental data
+        ax1.set_title("Experimental Spectrum")
         ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
         ax1.set_ylabel("Transmission")
         ax2 = self.figure.add_subplot(212)
@@ -103,7 +110,7 @@ class Spectrum(QtWidgets.QWidget):
         x2 = [i for i in range(100)] #pass the x1, y1 values to here for Anton's method
 
         #pass anton's method using the global variable fullParameters
-        y2 = [2 for i in x2]
+        y2 = [3 for i in x2]
 
         ax2.plot(x2, y2, 'b.-')
         self.canvas.draw_idle()
@@ -125,9 +132,10 @@ class Spectrum(QtWidgets.QWidget):
         and image viewer. We call the saveInput functions for all these instances
         and that is converted into an array called fullParameters above
         '''
+
+        '''IMAGEVIEWER INPUT'''
         self.imageviewerInput = self.imageviewer.saveInput()
         #imageviwerInput = [[xmin, xmax], [ymin, ymax], z, sum_image_data]
-
 
         self.xmin = self.imageviewerInput[0][0]
         self.xmax = self.imageviewerInput[0][1]
@@ -138,7 +146,7 @@ class Spectrum(QtWidgets.QWidget):
 
 
 
-
+        '''BEAMLINE INPUT'''
         self.beamlineInput = self.beamline.saveInput()
         #beamlineInput = [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
 
@@ -146,6 +154,9 @@ class Spectrum(QtWidgets.QWidget):
         self.delayOnTrigger = self.beamlineInput[1] #2 Delay on trigger: dT (miliseconds)
         self.energyRange = self.beamlineInput[2] #3 Minimum and Maximum Energy Range (eV)
         
+
+
+        '''MATERIALS INPUT'''
         self.materialsInput = self.materials.saveInput()
         #materialsInput is a pandas frame with the structure shown below:
         '''
@@ -157,11 +168,12 @@ class Spectrum(QtWidgets.QWidget):
         Material 5
         '''
         #where you can access the inputs by selecting the coordinates (e.g. materialsInput[0, 1] would return Materials 1's abundance)
-        #Note that not all 5 materials are used, for this instance the frame is entered 'NaN'
+        #Note that not all 5 materials are used, for this instance the frame element is entered 'NaN'
         
 
-        """
         #number of assert statements to make sure user input is as desired
+        #TODO: Create assertion tests to catch edge cases for completeness
+        """
         assert flightPath >= 0
         assert delayOnTrigger >= 0
         assert minimumEnergyRange >= 0
@@ -171,17 +183,8 @@ class Spectrum(QtWidgets.QWidget):
         assert density > 0
         assert thickness > 0
         assert component >= 1
-
-        energyRange = pd.array([minimumEnergyRange, maximumEnergyRange]) #size: 2
-        
-        #IsotopeName	Abundance	AtomicFraction	Density	AtomicMass	"Thickness,um"	GrupN
-        materialParameters = pd.DataFrame([elementName, isotopicAbundance, atomicFraction, density, thickness, component]) #size: 6
-        cross_sectional_data = pd.array([]) #size: 2 - DIETHER
-
-        
-        return flightPath, delayOnTrigger, energyRange, materialParameters, [cross_sectional_data]
+    
         """
-        return [self.imageviewerInput, self.beamlineInput, self.materialsInput]
 
 if __name__ == "__main__":
     import sys

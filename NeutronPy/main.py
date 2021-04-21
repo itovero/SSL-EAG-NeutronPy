@@ -16,20 +16,25 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setWindowTitle("NeutronPy")
 
+        #We'll be using GridLayout so each pyqt instances such as Beamline, Materials, ImageViewer, Spectrum
+        #can be displayed in their corresponding position as we desire
         layout = QGridLayout()
-        #layout.setColumnStretch(2,3)
-        #layout.setColumnStretch(1,5)
 
+        #Creating an instance of these classes for our window
+        #Robust so we can create multiply main.py windows for different operations in the future
+        #TODO: Robustness to create new separate main windows for other imaging experiments
         beamline = Beamline()
         materials = Materials()
         imageviewer = ImageViewerWindow()
         spectrum = Spectrum(beamline, materials, imageviewer)
 
+        #Defining where these instances go on the grid
         layout.addWidget(beamline, 0, 4, 1, 1)
         layout.addWidget(materials, 2, 2, 1, 3)
         layout.addWidget(spectrum, 0, 2, 2, 2)
         layout.addWidget(imageviewer, 0, 0, 3, 2)
 
+        #Preset height and width
         height = 800
         width = 1550
         self.setMinimumSize(width, height)
@@ -40,11 +45,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(widget)
         #print(Beamline().maxE.text())
 
-        #test button
-        self.pushButton = QtWidgets.QPushButton(self)
-        self.pushButton.setGeometry(QtCore.QRect(1000, 230, 93, 28))
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton.clicked.connect(materials.saveInput)
 
 if __name__ == "__main__":
     import sys
