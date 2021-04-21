@@ -41,10 +41,10 @@ class MainWindow(QtWidgets.QMainWindow):
         #print(Beamline().maxE.text())
 
         #test button
-        '''self.pushButton = QtWidgets.QPushButton(self)
-        self.pushButton.setGeometry(QtCore.QRect(120, 230, 93, 28))
+        self.pushButton = QtWidgets.QPushButton(self)
+        self.pushButton.setGeometry(QtCore.QRect(1000, 230, 93, 28))
         self.pushButton.setObjectName("pushButton")
-        self.pushButton.clicked.connect(materials.saveInput)'''
+        self.pushButton.clicked.connect(materials.saveInput)
 
 if __name__ == "__main__":
     import sys
