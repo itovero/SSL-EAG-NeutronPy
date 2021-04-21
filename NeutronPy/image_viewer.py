@@ -60,7 +60,7 @@ class image_viewer(QGraphicsView):
     def update_rect(self):
         top_left = self.mapFromScene(self.rect_scene.topLeft())
         bottom_right = self.mapFromScene(self.rect_scene.bottomRight())
-        self.rect.setGeometry(QRect(top_left ,bottom_right))
+        self.rect.setGeometry(QRect(top_left, bottom_right))
 
     def fit_to_window(self):
         self.zoom = 0
@@ -267,6 +267,7 @@ class ImageViewerWindow(QWidget):
         self.y_min.setValue(top_left.y())
         self.x_max.setValue(bottom_right.x())
         self.y_max.setValue(bottom_right.y())
+        #return [top_left.x(), top_left.y(), bottom_right.x(), bottom_right.y()]
 
     def update_rect(self):
         rect_new = QRect(QPoint(self.x_min.value(), self.y_min.value()), QPoint(self.x_max.value(), self.y_max.value()))
@@ -274,6 +275,31 @@ class ImageViewerWindow(QWidget):
         bottom_right = self.viewer.mapFromScene(rect_new.bottomRight())
         self.viewer.rect_scene = rect_new
         self.viewer.update_rect()
+        return [self.x_min.value(), self.x_max.value(), self.y_min.value(), self.y_max.value()]
+
+
+    #Save Input function for main.py integration
+    def saveInput(self):
+        """
+        top_left = self.viewer.mapToScene(rect.topLeft())
+        bottom_right = self.viewer.mapToScene(rect.bottomRight())
+        """
+
+        try:
+            """
+            xmin = float(top_left.x())
+            xmax = float(bottom_right.x())
+            ymin = float(top_left.y())
+            ymax = float(bottom_right.y())
+            """
+            z = float(self.scroll_bar.value()) #z doesn't update manually through inputting
+            xmin, xmax, ymin, ymax = self.update_rect()
+            print("xmin: " + str(xmin) + " xmax: " + str(xmax))
+            print("ymin: " + str(ymin) + " ymax: " + str(ymax))
+            print("z: " + str(z))
+            return [[xmin, xmax], [ymin, ymax], z]
+        except ValueError:
+            print('One of your inputs is not a number')
 
 
 if __name__ == "__main__":

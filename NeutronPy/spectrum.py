@@ -69,7 +69,7 @@ class Spectrum(QtWidgets.QWidget):
         The plotting function itself
         '''
         x = [i for i in range(100)]
-        y = [i**(fullParameters[0] + fullParameters[1]) for i in x]
+        y = [2 for i in x]
         
         
         ax3.plot(x, y, 'r.-')
@@ -91,7 +91,7 @@ class Spectrum(QtWidgets.QWidget):
         As we are plotting multiple functions in one graph
         '''    
         x1 = [i for i in range(200)]
-        y1 = [x1[0]*x1[1]*x1[2]*x1[3]*x1[6]*x1[7]*x1[8]*x1[9] for i in x1]
+        y1 = [2 for i in x1]
 
         ax1.plot(x1, y1, 'b.-')
         ax1.set_title("Experimental Spectrum") #obtained from Diether's experimental data
@@ -103,7 +103,7 @@ class Spectrum(QtWidgets.QWidget):
         x2 = [i for i in range(100)] #pass the x1, y1 values to here for Anton's method
 
         #pass anton's method using the global variable fullParameters
-        y2 = [fullParameters[1] for i in x2]
+        y2 = [2 for i in x2]
 
         ax2.plot(x2, y2, 'b.-')
         self.canvas.draw_idle()
@@ -125,13 +125,25 @@ class Spectrum(QtWidgets.QWidget):
         and image viewer. We call the saveInput functions for all these instances
         and that is converted into an array called fullParameters above
         '''
+        self.imageviewerInput = self.imageviewer.saveInput()
+        #imageviwerInput = [[xmin, xmax], [ymin, ymax], z]
 
-        beamlineInput = self.beamline.saveInput()
+
+        self.xmin = self.imageviewerInput[0][0]
+        self.xmax = self.imageviewerInput[0][1]
+        self.ymin = self.imageviewerInput[1][0]
+        self.ymax = self.imageviewerInput[1][1]
+        self.z = self.imageviewerInput[2]
+
+
+
+
+        self.beamlineInput = self.beamline.saveInput()
         #beamlineInput = [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
 
-        self.flightPath =  beamlineInput[0] #1 Flight Path: L (meters)
-        self.delayOnTrigger = beamlineInput[1] #2 Delay on trigger: dT (miliseconds)
-        self.energyRange = beamlineInput[2] #3 Minimum and Maximum Energy Range (eV)
+        self.flightPath =  self.beamlineInput[0] #1 Flight Path: L (meters)
+        self.delayOnTrigger = self.beamlineInput[1] #2 Delay on trigger: dT (miliseconds)
+        self.energyRange = self.beamlineInput[2] #3 Minimum and Maximum Energy Range (eV)
         
         self.materialsInput = self.materials.saveInput()
         #materialsInput is a pandas frame with the structure shown below:
@@ -146,6 +158,7 @@ class Spectrum(QtWidgets.QWidget):
         #where you can access the inputs by selecting the coordinates (e.g. materialsInput[0, 1] would return Materials 1's abundance)
         #Note that not all 5 materials are used, for this instance the frame is entered 'NaN'
         
+
         """
         #number of assert statements to make sure user input is as desired
         assert flightPath >= 0
@@ -167,7 +180,7 @@ class Spectrum(QtWidgets.QWidget):
         
         return flightPath, delayOnTrigger, energyRange, materialParameters, [cross_sectional_data]
         """
-        return [self.flightPath, self.delayOnTrigger, self.energyRange, self.materialsInput]
+        return [self.imageviewerInput, self.beamlineInput, self.materialsInput]
 
 if __name__ == "__main__":
     import sys
