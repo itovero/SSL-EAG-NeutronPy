@@ -1,4 +1,4 @@
-# SSL-EAG-NeutronPy
+# SSL-EAG-NeutronPy (v1.0)
 Space Science Laboratory Experimental Astrophysics Group Neutron Imaging at UC Berkeley for Fall 2020 and Spring 2021 
 
 ## Project Overview
