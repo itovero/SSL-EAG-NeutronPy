@@ -1,10 +1,8 @@
 import sys
 from os import listdir
 from os.path import isfile, join
-
 from astropy.io import fits
 import numpy as np
-
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -124,12 +122,12 @@ class ImageViewerWindow(QWidget):
         self.files = None
         self.dir = "."
 
-        #Load button
+        #Load button: Opens directory selection
         self.load_button = QToolButton(self)
         self.load_button.setText('Select File/Directory')
         self.load_button.clicked.connect(self.load_dir)
 
-        #Coordinates and their labels
+        #Coordinates of the selection rectangle and their labels
         self.x_min_label = QLabel("X Min")
         self.x_min = QSpinBox()
 
@@ -211,7 +209,6 @@ class ImageViewerWindow(QWidget):
 
         layout.addLayout(VB)
         layout.addLayout(HB)
-
 
     def load_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))

@@ -1,5 +1,4 @@
 import sys
-
 from PyQt5 import QtCore, QtWidgets, QtGui
 from materials import Materials
 from PyQt5.QtWidgets import *
@@ -14,10 +13,10 @@ class Beamline(QtWidgets.QWidget):
         super(Beamline, self).__init__()
         self.initUI()
 
+    #establish the layout of the beamline UI
     def initUI(self):
-
         self.groupBox_3 = QtWidgets.QGroupBox(self)
-        self.groupBox_3.setGeometry(QtCore.QRect(0, 0, 280, 241))
+        self.groupBox_3.setGeometry(QtCore.QRect(0, 0, 280, 241)) #set window size
         self.groupBox_3.setObjectName("groupBox_3")
         self.label = QtWidgets.QLabel(self.groupBox_3)
         self.label.setGeometry(QtCore.QRect(10, 40, 101, 16))
@@ -43,6 +42,8 @@ class Beamline(QtWidgets.QWidget):
         self.label_8 = QtWidgets.QLabel(self.groupBox_3)
         self.label_8.setGeometry(QtCore.QRect(180, 190, 71, 16))
         self.label_8.setObjectName("label_8")
+
+        #establish text input boxes
         self.length = QtWidgets.QLineEdit(self.groupBox_3)
         self.length.setGeometry(QtCore.QRect(120, 40, 51, 22))
         self.length.setText("0")
@@ -61,13 +62,9 @@ class Beamline(QtWidgets.QWidget):
         self.maxE.setObjectName("maxE")
 
         self.retranslateUi(QtWidgets.QWidget())
-        
-        '''self.pushButton = QtWidgets.QPushButton("Test", self)
-        self.pushButton.setGeometry(QtCore.QRect(120, 230, 93, 28))
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton.clicked.connect(self.saveInput)'''
         self.show()
 
+    #return input box values as an array of floats
     def saveInput(self):
         try:
             flightPath = float(self.length.text())
@@ -79,6 +76,7 @@ class Beamline(QtWidgets.QWidget):
         except ValueError:
             print('One of your inputs is not a number')
 
+    #populate the labels created previously with text
     def retranslateUi(self, integrated):
         _translate = QtCore.QCoreApplication.translate
         self.groupBox_3.setTitle(_translate("deliverable", "Beam Line Characteristics"))

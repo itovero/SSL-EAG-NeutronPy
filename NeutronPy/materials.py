@@ -1,6 +1,5 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 import pandas as pd
 import numpy as np
 
@@ -10,6 +9,7 @@ class Materials(QtWidgets.QWidget):
         self.initUI()
 
     def initUI(self):
+        #Create the table layout
         self.tableWidget = QtWidgets.QTableWidget(self)
         self.tableWidget.setGeometry(QtCore.QRect(0, 0, 767, 180))
         self.tableWidget.setObjectName("tableWidget")
@@ -112,12 +112,12 @@ class Materials(QtWidgets.QWidget):
 
         self.retranslateUi(QtWidgets.QWidget())
 
-        self.show() #- UNCOMMENT THIS LINE FOR SELF DEBUGGING
+        self.show()
 
     def retranslateUi(self, integrated):
         _translate = QtCore.QCoreApplication.translate
 
-        #text for tab 3
+        #populate the header labels with text
         item = self.tableWidget.verticalHeaderItem(0)
         item.setText(_translate("integrated", "Material 1"))
         item = self.tableWidget.verticalHeaderItem(1)
@@ -144,6 +144,8 @@ class Materials(QtWidgets.QWidget):
         item.setText(_translate("integrated", "Component"))
         __sortingEnabled = self.tableWidget.isSortingEnabled()
         self.tableWidget.setSortingEnabled(False)
+
+        #populate the entry boxes with blank values
         item = self.tableWidget.item(0, 0)
         item.setText(_translate("integrated", " "))
         item = self.tableWidget.item(0, 1)
@@ -216,6 +218,7 @@ class Materials(QtWidgets.QWidget):
         item.setText(_translate("integrated", ""))
         self.tableWidget.setSortingEnabled(__sortingEnabled)
 
+    #returns a 2D pandas frame containing al of the table's values
     def saveInput(self):
         rows = self.tableWidget.rowCount()
         columns = self.tableWidget.columnCount()
