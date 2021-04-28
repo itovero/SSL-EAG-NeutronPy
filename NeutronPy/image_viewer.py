@@ -226,7 +226,7 @@ class ImageViewerWindow(QWidget):
 
             #For debugging, looking at the load_new_images method will be helpful as abstractions
             #are omitted for this list comprehension to maintain fastest runtime
-            self.image_cube = np.array([fits.open(self.dir + '/' + self.files[fileNum])[0].data for fileNum in range(0, len(self.files) - 1)])
+            self.image_cube = np.array([fits.open(self.dir + '/' + self.files[fileNum])[0].data for fileNum in range(0, (len(self.files) - 1))])
 
             self.scroll_bar.setMaximum(len(self.files) - 1)
             self.z.setMaximum(len(self.files) - 1)
