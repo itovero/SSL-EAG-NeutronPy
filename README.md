@@ -12,11 +12,11 @@ test parameters and optimize on the fly. The current project is a development ef
 a tool set. In addition, it is envisioned the toolset could be utilized from home or office. This is called NeutronPy
 
 ## Team
-**PI**: Anton Tremsin
+**PI**: Anton Tremsin (fa20, sp21)
 
-**Project Management**: Travis Curtis, Nate Darling
+**Project Management**: Travis Curtis (fa20, sp21), Nate Darling (fa20)
 
-**Project Lead**: James Mang
+**Project Lead**: James Mang (fa20)
 
 **Development Team**: Yuki Ito (fa20, sp21), Tino Trangia (fa20, sp21), Diether Delosreyes (fa20), and Paulina Umansky (fa20)
 
