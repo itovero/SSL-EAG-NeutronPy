@@ -1,5 +1,7 @@
 # NeutronPy 
-UI created by PyQT5
+UI created using PyQT5
+Data visualization using matplotlib, numpy, pandas
+Image visulization and extraction using astropy
 
 ## How to run the program
 Run the main.py file install any necessary packages using pip or anything for your terminal.
