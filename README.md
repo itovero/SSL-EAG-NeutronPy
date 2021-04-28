@@ -18,4 +18,10 @@ a tool set. In addition, it is envisioned the toolset could be utilized from hom
 
 **Project Lead**: James Mang
 
-**Development Team**: Diether Delosreyes, Yuki Ito, Tino Trangia, and Paulina Umansky
+**Development Team**: Yuki Ito (fa20, sp21), Tino Trangia (fa20, sp21), Diether Delosreyes (fa20), and Paulina Umansky (fa20)
+
+## Files
+**Prototype**: Prototype the Development Team created during fa20 semester. Yuki Ito: spectrum.py, main.py; Tino Trangia: beamline.py; Diether Delosreyes: image_viewer.py; Paulina Umansky: materials.py
+
+**NeutronPy**: Newest edition of NeutronPy created and integrated by Yuki Ito and Tino Trangia for sp21 semester. More Information of how NeutronPy works can be found on the directory README and the code itself.
+
