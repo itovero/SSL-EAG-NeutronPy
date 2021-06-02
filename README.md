@@ -1,5 +1,5 @@
 # SSL-EAG-NeutronPy (v1.0)
-Space Science Laboratory Experimental Astrophysics Group Neutron Imaging Data visualization Tool at UC Berkeley for Fall 2020, Spring 2021, and Summer 2021.
+Space Science Laboratory Experimental Astrophysics Group Neutron Imaging Data Visualization Tool at UC Berkeley for Fall 2020, Spring 2021, and Summer 2021.
 
 ## Project Overview
 Element and/or isotope mapping is done using a neutron beam-line source and
