@@ -8,6 +8,7 @@ import pandas as pd
 from beamline import Beamline
 from image_viewer import ImageViewerWindow
 from materials import Materials
+import numpy as np
 
 class Spectrum(QtWidgets.QWidget):
     def __init__(self, beamline, materials, imageviewer):
@@ -100,7 +101,10 @@ class Spectrum(QtWidgets.QWidget):
         x1 = [i for i in range(200)]
         y1 = [2 for i in x1]
 
+        x1_1 = [i for i in range(200)]
+        y1_1 = np.sin(x1_1)
         ax1.plot(x1, y1, 'b.-')
+        ax1.plot(x1_1, y1_1)
         ax1.set_title("Experimental Spectrum")
         ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
         ax1.set_ylabel("Transmission")
