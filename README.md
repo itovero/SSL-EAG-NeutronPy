@@ -1,5 +1,5 @@
 # SSL-EAG-NeutronPy (v1.0)
-Space Science Laboratory Experimental Astrophysics Group Neutron Imaging at UC Berkeley for Fall 2020 and Spring 2021 
+Space Science Laboratory Experimental Astrophysics Group Neutron Imaging Data visualization Tool at UC Berkeley for Fall 2020, Spring 2021, and Summer 2021.
 
 ## Project Overview
 Element and/or isotope mapping is done using a neutron beam-line source and
@@ -9,7 +9,7 @@ limited, with researchers often working around the clock to get their experiment
 reserved block of time. Given the time constraints, it's very useful to have a robust data
 visualization software toolset so that the researcher can view data in near real-time to adjust
 test parameters and optimize on the fly. The current project is a development effort for just such
-a tool set. In addition, it is envisioned the toolset could be utilized from home or office. This is called NeutronPy
+a tool set. In addition, it is envisioned the toolset could be utilized from home or office. 
 
 ## Team
 **PI**: Anton Tremsin (fa20, sp21, su21)
@@ -26,6 +26,9 @@ a tool set. In addition, it is envisioned the toolset could be utilized from hom
 **NeutronPy v1.0**: The first edition of NeutronPy created and integrated by Yuki Ito and Tino Trangia for sp21 semester. More Information of how NeutronPy works can be found on the directory README and the code itself.
 
 **NeutronPy Newest**: Our current updated iteration of NeutronPy working during the Summer 2021 timeline. An optimized version of 1.0 
+
+## How to use
+
 
 ## Logs
 
