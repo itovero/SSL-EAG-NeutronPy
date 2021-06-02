@@ -61,7 +61,7 @@ The URL should be located like so
 
 Now, you should be able to scroll through the sequence using the scrollbar right below the image and filling into the paramters you'd want to use, then upload those parameters for spectrum visualization by pressing the Plot 1 or Plot 2 buttons! Go crazy!
 
- **More information on how to debug and looking into the inner works, go to the README for the respective version **
+ **More information on how to debug and looking into the inner works, go to the README for the respective version**
  
 ## Logs
 
