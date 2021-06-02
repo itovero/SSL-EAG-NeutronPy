@@ -33,10 +33,36 @@ a tool set. In addition, it is envisioned the toolset could be utilized from hom
 git clone <insert URL here>
 ```
 The URL should be located like so
-![Capture](https://user-images.githubusercontent.com/45677734/120540610-bcd09480-c39d-11eb-84b0-5f6ad6ce9cf7.PNG)
 
 
- **2**. After cloning the repository, go to the version of NeutronPy you want to launch (preferably the newest and the most updated one) and make sure you have python 3.6 or recent installed in the command line and you will want to run ``` python main.py```. Note that you will most likely have to install some dependencies NeutronPy uses onto your device. It'll mention which dependencies you are currently missing from the error message when you try to run ```main.py```. Therefore, using a package management/ installment system like pip, you wuld want to install like so: ``` pip install <insert library or dependency name here> ```. Now you should be able to run ``` python main.py``` successfully!
+
+
+![Capture](https://user-images.githubusercontent.com/45677734/120541452-c0185000-c39e-11eb-8495-a6cdb41f3a60.PNG)
+
+
+
+
+
+ **2**. After cloning the repository, go to the version of NeutronPy you want to launch (preferably the newest and the most updated one) and make sure you have python 3.6 or recent installed in the command line and you will want to run ``` python main.py```. Note that you will most likely have to install some dependencies NeutronPy uses onto your device. It'll mention which dependencies you are currently missing from the error message when you try to run ```main.py```. Therefore, using a package management/ installment system like pip, you wuld want to install like so: ``` pip install <insert library or dependency name here> ```. Now you should be able to run ``` python main.py``` successfully! A window that looks something like this should pop up:
+ 
+ 
+ 
+ ![Capture](https://user-images.githubusercontent.com/45677734/120541757-22715080-c39f-11eb-8383-82dd7689199c.PNG)
+ 
+ 
+
+
+**3**. To use this toolset, you'd want a dataset of the neutron imaging sequence ready in a directory. Navigating yourself onto the "Select File / Directory", select the directory you want to view and work on and press Enter. It would take some time to load depending on the length of the data set and you should see the first slice of the imaging sequence on the GUI like so:
+
+
+![Capture](https://user-images.githubusercontent.com/45677734/120542246-b93e0d00-c39f-11eb-9689-ab33c1d7ca91.PNG)
+
+
+
+Now, you should be able to scroll through the sequence using the scrollbar right below the image and filling into the paramters you'd want to use, then upload those parameters for spectrum visualization by pressing the Plot 1 or Plot 2 buttons! Go crazy!
+
+ 
+ 
 ## Logs
 
 **Fall 2020**: With our initial development of this data visualization tool in mind, we decided to split up the software development into four parts: Spectrum visuzalier, materials parameter, image viewer (to view the fits data cube), and the beamline parameters. The semester throughout was mainly us figuring out PyQT and the QT framework and creating an initial UI for each of the components. Because of this, the integration process showed to be difficult as we had different implementation and coordination in mind and the semester ended with a basic integration scheme of these components.
