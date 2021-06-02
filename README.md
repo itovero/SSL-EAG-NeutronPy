@@ -27,9 +27,16 @@ a tool set. In addition, it is envisioned the toolset could be utilized from hom
 
 **NeutronPy Newest**: Our current updated iteration of NeutronPy working during the Summer 2021 timeline. An optimized version of 1.0 
 
-## How to use
+## How To Launch
+**1**. In your command line and in a directory you want NeutronPy to be in, you first want to clone this repository.  
+```
+git clone <insert URL here>
+```
+The URL should be located like so
+![Capture](https://user-images.githubusercontent.com/45677734/120540610-bcd09480-c39d-11eb-84b0-5f6ad6ce9cf7.PNG)
 
 
+ **2**. After cloning the repository, go to the version of NeutronPy you want to launch (preferably the newest and the most updated one) and make sure you have python 3.6 or recent installed in the command line and you will want to run ``` python main.py```. Note that you will most likely have to install some dependencies NeutronPy uses onto your device. It'll mention which dependencies you are currently missing from the error message when you try to run ```main.py```. Therefore, using a package management/ installment system like pip, you wuld want to install like so: ``` pip install <insert library or dependency name here> ```. Now you should be able to run ``` python main.py``` successfully!
 ## Logs
 
 **Fall 2020**: With our initial development of this data visualization tool in mind, we decided to split up the software development into four parts: Spectrum visuzalier, materials parameter, image viewer (to view the fits data cube), and the beamline parameters. The semester throughout was mainly us figuring out PyQT and the QT framework and creating an initial UI for each of the components. Because of this, the integration process showed to be difficult as we had different implementation and coordination in mind and the semester ended with a basic integration scheme of these components.
