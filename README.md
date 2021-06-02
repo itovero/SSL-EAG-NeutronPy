@@ -23,5 +23,6 @@ a tool set. In addition, it is envisioned the toolset could be utilized from hom
 ## Files
 **Prototype**: Prototype the Development Team created during fa20 semester. Yuki Ito: spectrum.py, main.py; Tino Trangia: beamline.py; Diether Delosreyes: image_viewer.py; Paulina Umansky: materials.py
 
-**NeutronPy**: Newest edition of NeutronPy created and integrated by Yuki Ito and Tino Trangia for sp21 semester. More Information of how NeutronPy works can be found on the directory README and the code itself.
+**NeutronPy v1.0**: The first edition of NeutronPy created and integrated by Yuki Ito and Tino Trangia for sp21 semester. More Information of how NeutronPy works can be found on the directory README and the code itself.
 
+**NeutronPy Newest**: Our current updated iteration of NeutronPy working during the Summer 2021 timeline. An optimized version of 1.0 
