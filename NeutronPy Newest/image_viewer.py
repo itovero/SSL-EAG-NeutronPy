@@ -1,10 +1,8 @@
-import sys
+import sys, traceback
 from os import listdir
 from os.path import isfile, join
 from astropy.io import fits
 import numpy as np
-import math
-import gc
 import time
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import *
@@ -23,30 +21,39 @@ class selector(QRubberBand):
         #painter.setOpacity(0.3)
         painter.drawRect(event.rect())
 
-class Worker(QRunnable):
-    def __init__(self, image_cube, fileLen, dir, files):
-        super(Worker, self).__init__()
+class ImageCubeLoadSignal(QObject):
+    #Class to monitor the progress of loading the fits files into the image cube
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+    progress = pyqtSignal(int)
+
+class ImageCubeLoader(QRunnable):
+    #Separate Thread to handle mutliprocesses 
+    #This one, in particular, deals with opening each fits file and inserting them into the image cube
+    def __init__(self, fn, *args, **kwargs):
+        super(ImageCubeLoader, self).__init__()
         # Store constructor arguments (re-used for processing)
-        self.image_cube = image_cube
-        self.fileLen = fileLen
-        self.dir = dir
-        self.files = files
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+
+        self.signals = ImageCubeLoadSignal()
+        self.kwargs['progress_callback'] = self.signals.progress
 
     @pyqtSlot()
     def run(self):
-        '''
-        Your code goes in this function
-        '''
-        print("Thread start")
-        for fileNum in range(0, self.fileLen):
-            with fits.open(self.dir + '/' + self.files[fileNum], memmap = True) as hdul:
-                #print(fileNum, hdul[0].data)
-                self.image_cube.append(hdul[0].data)
-                del hdul[0].data
-        self.image_cube = np.array(self.image_cube)
-        print("Thread complete")
-        global global_image_cube
-        global_image_cube = self.image_cube
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except: 
+            #Handles exception if there's an issue with loading data
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.result.emit(result)
+        finally:
+            self.signals.finished.emit()
 
 class image_viewer(QGraphicsView):
     rect_sig = pyqtSignal(QRect)
@@ -148,8 +155,7 @@ class ImageViewerWindow(QWidget):
         super().__init__()
         #For multi-threading data loadout
         self.threadpool = QThreadPool()
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
-        
+        #self.image_cube = []
 
         self.viewer = image_viewer()
         self.files = None
@@ -242,7 +248,7 @@ class ImageViewerWindow(QWidget):
 
         layout.addLayout(VB)
         layout.addLayout(HB)
-
+    
     def load_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
 
@@ -257,40 +263,35 @@ class ImageViewerWindow(QWidget):
 
             #loads every image file in the directory into an image cube containing information
             #on each pixel of each slice of data
-
-            #TODO: This part precisely is where all the long loading takes every time
-            #       you are trying to open up a new data set - therefore optimizing this
-            #       would be great for future implementation
-
             #For debugging, looking at the load_new_images method will be helpful as abstractions
             #are omitted for this list comprehension to maintain fastest runtime
-
+            def load_image_cube(progress_callback):
+                self.image_cube = []
+                tic = time.perf_counter()
+                fileLen = len(self.files)
+                for fileNum in range(0, fileLen):
+                    with fits.open(self.dir + '/' + self.files[fileNum], memmap = True) as hdul:
+                        self.image_cube.append(hdul[0].data)
+                        del hdul[0].data
+                        progress_callback.emit(fileNum / fileLen * 100)
+                self.image_cube = np.array(self.image_cube)
+                toc = time.perf_counter()
+                print(f"Finishing loading data in {toc - tic:0.4f} seconds")
+            
+            def progress_fn(n):
+                print("%d%% done" % n)
 
             #Naive Approach: This method literally takes in all the pixel arrays found on the fits file and shoves them into an image_cube
                 #Pros: This method is great as the runtime of you selecting a region and computing the sum becomes way faster beacause it took everything in from the beginning
                 #Cons: This method suffers from crashes often and is highly dependent on the amount of fits file and data you have (disk-space error)
-            """
             def naive_load_data():
-                #self.image_cube = np.array([fits.open(self.dir + '/' + self.files[fileNum])[0].data for fileNum in range(0, (len(self.files) - 1))])
-                self.image_cube = []
-                for fileNum in range(0, len(self.files)):
-                    with fits.open(self.dir + '/' + self.files[fileNum], memmap = True) as hdul:
-                        #print(fileNum, hdul[0].data)
-                        self.image_cube.append(hdul[0].data)
-                        del hdul[0].data
-                gc.collect()
-                self.image_cube = np.array(self.image_cube)
-            """
-
-            def naive_load_data():
-                #self.image_cube = np.array([fits.open(self.dir + '/' + self.files[fileNum])[0].data for fileNum in range(0, (len(self.files) - 1))])
-                worker = Worker([], len(self.files), self.dir, self.files)
-                self.threadpool.start(worker)
-
-            tic = time.perf_counter()
+                cubeThread = ImageCubeLoader(load_image_cube)
+                cubeThread.signals.progress.connect(progress_fn)
+                self.threadpool.start(cubeThread)
             naive_load_data()
-            toc = time.perf_counter()
-            print(f"Instantiated image_cube in {toc - tic:0.4f} seconds")
+
+
+
             #Compressed Approach: 
                 #We create a image cube 3D array with NaN values and instantiate them
             """
@@ -382,25 +383,12 @@ class ImageViewerWindow(QWidget):
 
             def naive_sum_data():
                 #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
-                self.sumImageCube = np.array([np.sum((global_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(global_image_cube))])
-            tic = time.perf_counter()
+                self.sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
+            #tic = time.perf_counter()
             naive_sum_data()
-            toc = time.perf_counter()
-            print(f"Calculated the sum in {toc - tic:0.4f} seconds")
+            #toc = time.perf_counter()
+            #print(f"Calculated the sum in {toc - tic:0.4f} seconds")
             
-
-            """
-            def compressed_update_sum_data():
-                #Access the values then store them into self.image_cube for future access.
-                self.sumImageCube = np.zeros(len(self.files))
-                for sliceNum in range(0, len(self.files) - 1):
-                    for x in range(xmin, xmax + 1):
-                        for y in range(ymin, ymax + 1):
-                            if math.isnan(self.image_cube[sliceNum][x][y]):
-                                self.image_cube[sliceNum][x][y] = fits.open(self.dir + '/' + self.files[sliceNum])[0].data[x][y]
-                    self.sumImageCube[sliceNum] = np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax])
-            compressed_update_sum_data()
-            """
             #These print statements are here for whenever you want to see if the inputs are actually updating when you click on the plots in spectrum
             #Can comment out if needed
             print("xmin: " + str(xmin) + " xmax: " + str(xmax))
