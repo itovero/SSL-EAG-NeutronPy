@@ -1,8 +1,9 @@
-import sys
+import sys, traceback
 from os import listdir
 from os.path import isfile, join
 from astropy.io import fits
 import numpy as np
+import time
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -20,6 +21,45 @@ class selector(QRubberBand):
         #painter.setOpacity(0.3)
         painter.drawRect(event.rect())
 
+
+##ImageCubeLoadSignal and ImageCubeLoader is a class that assists in dumping all the data into the image cube without having to terminate the MainWindow
+##Done via multi-threading
+class ImageCubeLoadSignal(QObject):
+    #Class to monitor the progress of loading the fits files into the image cube
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+    progress = pyqtSignal(int)
+
+class ImageCubeLoader(QRunnable):
+    #Separate Thread to handle mutliprocesses 
+    #This one, in particular, deals with opening each fits file and inserting them into the image cube
+    def __init__(self, fn, *args, **kwargs):
+        super(ImageCubeLoader, self).__init__()
+        # Store constructor arguments (re-used for processing)
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+
+        self.signals = ImageCubeLoadSignal()
+        self.kwargs['progress_callback'] = self.signals.progress
+
+    @pyqtSlot()
+    def run(self):
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except: 
+            #Handles exception if there's an issue with loading data
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.result.emit(result)
+        finally:
+            self.signals.finished.emit()
+
+
+##Image_viewer is the actual image GUI we see on the top left of the screen
 class image_viewer(QGraphicsView):
     rect_sig = pyqtSignal(QRect)
 
@@ -118,6 +158,10 @@ class image_viewer(QGraphicsView):
 class ImageViewerWindow(QWidget):
     def __init__(self):
         super().__init__()
+        #For multi-threading data loadout
+        self.threadpool = QThreadPool()
+        #self.image_cube = []
+
         self.viewer = image_viewer()
         self.files = None
         self.dir = "."
@@ -146,10 +190,8 @@ class ImageViewerWindow(QWidget):
         self.z.valueChanged.connect(self.load_new_image_z)
 
         self.z_interval_label = QLabel("Z Interval")
-        self.z_interval = QSpinBox() #TODO: There seems to be no implementation of the z-intervals in the codebase of imageviewer at the moment
-                                     # If someone ever wants to add this feature, we can pass the new z-interval through the image_cube and have it use the command image_cube[::z_interval]
-                                     # of sorts to implement (a.k.a it should be pretty straight forward to implement)
-        
+        self.z_interval = QSpinBox() #TODO: Delete this Z interval - we don't need this per se anymore
+
         self.z_interval.setMinimum(1)
 
         #Update values based on changes in both the viewer and the spinboxes
@@ -184,32 +226,23 @@ class ImageViewerWindow(QWidget):
         HB = QVBoxLayout(self)
         HB.setAlignment(Qt.AlignLeft)
         HB.addWidget(self.load_button)
-
         HB.addWidget(self.x_min_label)
         HB.addWidget(self.x_min)
-
         HB.addWidget(self.x_max_label)
         HB.addWidget(self.x_max)
-
         HB.addWidget(self.y_min_label)
         HB.addWidget(self.y_min)
-
         HB.addWidget(self.y_max_label)
         HB.addWidget(self.y_max)
-
         HB.addWidget(self.z_label)
         HB.addWidget(self.z)
-
         HB.addWidget(self.z_interval_label)
         HB.addWidget(self.z_interval)
-
-
         HB.addWidget(self.slider_label)
         HB.addWidget(self.slider)
-
         layout.addLayout(VB)
         layout.addLayout(HB)
-
+    
     def load_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
 
@@ -217,21 +250,58 @@ class ImageViewerWindow(QWidget):
         if dir != '': 
             self.files = listdir(self.dir)
 
-            #loads every image file in the directory into an image cube containing information
-            #on each pixel of each slice of data
-
-            #TODO: This part precisely is where all the long loading takes every time
-            #       you are trying to open up a new data set - therefore optimizing this
-            #       would be great for future implementation
-
-            #For debugging, looking at the load_new_images method will be helpful as abstractions
-            #are omitted for this list comprehension to maintain fastest runtime
-            self.image_cube = np.array([fits.open(self.dir + '/' + self.files[fileNum])[0].data for fileNum in range(0, len(self.files) - 1)])
-
             self.scroll_bar.setMaximum(len(self.files) - 1)
             self.z.setMaximum(len(self.files) - 1)
             self.z_interval.setMaximum(len(self.files) - 1)
             self.load_new_image(0)
+
+            #loads every image file in the directory into an image cube containing information
+            #on each pixel of each slice of data
+            #For debugging, looking at the load_new_images method will be helpful as abstractions
+            #are omitted for this list comprehension to maintain fastest runtime
+            def load_image_cube(progress_callback):
+                self.image_cube = []
+                tic = time.perf_counter()
+                fileLen = len(self.files)
+                for fileNum in range(0, fileLen):
+                    with fits.open(self.dir + '/' + self.files[fileNum], memmap = True) as hdul:
+                        self.image_cube.append(hdul[0].data)
+                        del hdul[0].data
+                        if (fileNum - 1) * 100 // fileLen  != fileNum * 100 // fileLen:
+                            progress_callback.emit(fileNum / fileLen * 100)
+                self.image_cube = np.array(self.image_cube)
+                toc = time.perf_counter()
+                print(f"Finishing loading data in {toc - tic:0.4f} seconds")
+            
+            def progress_fn(n):
+                print("%d%% done" % n)
+
+            #Naive Approach: This method literally takes in all the pixel arrays found on the fits file and shoves them into an image_cube
+                #Pros: This method is great as the runtime of you selecting a region and computing the sum becomes way faster beacause it took everything in from the beginning
+                #Cons: This method might suffer from some poor runtime to dump all the fits file into an image cube but doesn't seem too much of a problem at the moment
+            def naive_load_data():
+                cubeThread = ImageCubeLoader(load_image_cube)
+                cubeThread.signals.progress.connect(progress_fn)
+                self.threadpool.start(cubeThread)
+            
+            naive_load_data() #In the case runtime becomes an issue, take a look at the compressed_load_data function and implementation
+                              #Similar to naive_load_data(), it has its pros and cons - personally in my opinion, naive_load_data() does better
+
+            #Compressed Approach: 
+                #We create a image cube 3D array with NaN values and instantiate them
+            """
+            def compressed_load_data():
+                oneSlice = fits.open(self.dir + '/' + self.files[0])[0].data
+                length = len(oneSlice)
+                width = len(oneSlice[0])
+                self.image_cube = np.empty((len(self.files), length, width))
+                self.image_cube[:] = np.NaN
+
+            tic = time.perf_counter()
+            compressed_load_data()
+            toc = time.perf_counter()
+            print(f"Instantiated image_cube in {toc - tic:0.4f} seconds")
+            """
 
     # Loads a new image from the image library
     #   This load_new_image is only for the image viewing purposes - it only loads and 
@@ -300,21 +370,21 @@ class ImageViewerWindow(QWidget):
             #z : SliceNum
             z = float(self.scroll_bar.value())
             
-            #TODO implement z_interval into saveInput
-            #z_interval = ....
-            
             #xmin, xmax are the x coordinates of the rectangle user selected; same goes for y
             xmin, xmax, ymin, ymax = self.update_rect()
 
-            #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
-            sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
+            def naive_sum_data():
+                #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
+                self.sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
+            
+            naive_sum_data()
             
             #These print statements are here for whenever you want to see if the inputs are actually updating when you click on the plots in spectrum
             #Can comment out if needed
             print("xmin: " + str(xmin) + " xmax: " + str(xmax))
             print("ymin: " + str(ymin) + " ymax: " + str(ymax))
             print("z: " + str(z))
-            return [[xmin, xmax], [ymin, ymax], z, sumImageCube]
+            return [[xmin, xmax], [ymin, ymax], z, self.sumImageCube]
         except ValueError:
             print('One of your inputs is not a number')
 
