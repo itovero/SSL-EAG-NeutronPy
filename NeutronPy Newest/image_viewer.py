@@ -8,6 +8,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from progress import Progress
 
 class selector(QRubberBand):
     def __init__(self, *arg, **kwargs):
@@ -275,11 +276,14 @@ class ImageViewerWindow(QWidget):
             
             def progress_fn(n):
                 print("%d%% done" % n)
+                self.loadBar.setValue(n)
 
             #Naive Approach: This method literally takes in all the pixel arrays found on the fits file and shoves them into an image_cube
                 #Pros: This method is great as the runtime of you selecting a region and computing the sum becomes way faster beacause it took everything in from the beginning
                 #Cons: This method might suffer from some poor runtime to dump all the fits file into an image cube but doesn't seem too much of a problem at the moment
             def naive_load_data():
+                self.loadingBar = Progress()
+                self.loadingBar.show()
                 cubeThread = ImageCubeLoader(load_image_cube)
                 cubeThread.signals.progress.connect(progress_fn)
                 self.threadpool.start(cubeThread)

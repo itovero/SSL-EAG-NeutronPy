@@ -8,6 +8,7 @@ from materials import Materials
 from image_viewer import ImageViewerWindow
 import os
 import ctypes
+from progress import Progress
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -27,7 +28,7 @@ class MainWindow(QtWidgets.QMainWindow):
         materials = Materials()
         imageviewer = ImageViewerWindow()
         spectrum = Spectrum(beamline, materials, imageviewer)
-
+        load = Progress()
         #Defining where these instances go on the grid
         layout.addWidget(beamline, 0, 4, 1, 1)
         layout.addWidget(materials, 2, 2, 1, 3)
@@ -44,7 +45,6 @@ class MainWindow(QtWidgets.QMainWindow):
         widget.setLayout(layout)
         self.setCentralWidget(widget)
         #print(Beamline().maxE.text())
-
 
 if __name__ == "__main__":
     import sys
