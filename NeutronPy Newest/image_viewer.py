@@ -45,6 +45,8 @@ class ImageCubeLoader(QRunnable):
         self.signals = ImageCubeLoadSignal()
         self.kwargs['progress_callback'] = self.signals.progress
 
+    
+
     @pyqtSlot()
     def run(self):
         try:
@@ -261,8 +263,12 @@ class ImageViewerWindow(QWidget):
             #For debugging, looking at the load_new_images method will be helpful as abstractions
             #are omitted for this list comprehension to maintain fastest runtime
             def load_image_cube(progress_callback):
+                #TODO initially have it dump into a numpy array
+
+                
+                #Take the data from all the fits files and dump them into an array
                 self.image_cube = []
-                tic = time.perf_counter()
+                startTimer1 = time.perf_counter()
                 fileLen = len(self.files)
                 for fileNum in range(0, fileLen):
                     with fits.open(self.dir + '/' + self.files[fileNum], memmap = True) as hdul:
@@ -270,20 +276,32 @@ class ImageViewerWindow(QWidget):
                         del hdul[0].data
                         if (fileNum - 1) * 100 // fileLen  != fileNum * 100 // fileLen:
                             progress_callback.emit(fileNum / fileLen * 100)
-                self.image_cube = np.array(self.image_cube)
-                toc = time.perf_counter()
-                print(f"Finishing loading data in {toc - tic:0.4f} seconds")
+                endTimer1 = time.perf_counter()
+                progress_callback.emit(100)
+                self.loadingBar.finishFits2Array(endTimer1 - startTimer1)
+                time.sleep(2)
+
+                #Initializing Image Cube into a Numpy Array
+                startTimer2 = time.perf_counter()
+                self.loadingBar.startLoadImageCube()
+                self.image_cube = np.array(self.image_cube) #this apparently takes a long time ~7.6 s for 2600 fits files
+                endTimer2 = time.perf_counter()
+                self.loadingBar.finishLoadImageCube(endTimer2 - startTimer2)
+                time.sleep(2)
+
+                #Close the loading window
+                self.loadingBar.close()
             
             def progress_fn(n):
-                print("%d%% done" % n)
-                self.loadBar.setValue(n)
+                #   print("%d%% done" % n)
+                self.loadingBar.setValue(n)
 
             #Naive Approach: This method literally takes in all the pixel arrays found on the fits file and shoves them into an image_cube
                 #Pros: This method is great as the runtime of you selecting a region and computing the sum becomes way faster beacause it took everything in from the beginning
                 #Cons: This method might suffer from some poor runtime to dump all the fits file into an image cube but doesn't seem too much of a problem at the moment
             def naive_load_data():
+                #loading bar
                 self.loadingBar = Progress()
-                self.loadingBar.show()
                 cubeThread = ImageCubeLoader(load_image_cube)
                 cubeThread.signals.progress.connect(progress_fn)
                 self.threadpool.start(cubeThread)

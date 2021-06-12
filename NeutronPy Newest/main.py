@@ -28,7 +28,6 @@ class MainWindow(QtWidgets.QMainWindow):
         materials = Materials()
         imageviewer = ImageViewerWindow()
         spectrum = Spectrum(beamline, materials, imageviewer)
-        load = Progress()
         #Defining where these instances go on the grid
         layout.addWidget(beamline, 0, 4, 1, 1)
         layout.addWidget(materials, 2, 2, 1, 3)
