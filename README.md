@@ -16,7 +16,7 @@ a tool set. In addition, it is envisioned the toolset could be utilized from hom
 
 **Project Management**: Travis Curtis (fa20, sp21, su21), Nate Darling (fa20)
 
-**Project Lead**: James Mang (fa20), Yuki Ito and Tino Trangia (sp21, su21)
+**Project Lead**: Yuki Ito (sp21, su21), James Mang (fa20)
 
 **Development Team**: Yuki Ito (fa20, sp21, su21), Tino Trangia (fa20, sp21, su21), Diether Delosreyes (fa20), and Paulina Umansky (fa20)
 
@@ -25,7 +25,7 @@ a tool set. In addition, it is envisioned the toolset could be utilized from hom
 
 **NeutronPy v1.0**: The first edition of NeutronPy created and integrated by Yuki Ito and Tino Trangia for sp21 semester. More Information of how NeutronPy works can be found on the directory README and the code itself.
 
-**NeutronPy Newest**: Our current updated iteration of NeutronPy working during the Summer 2021 timeline. An optimized version of 1.0 
+**NeutronPy Newest**: Our current updated iteration of NeutronPy working during the Summer 2021 timeline. An optimized version of 1.0. Added multi-threading functionalities to prevent the application from crashing on any arbitrary dataset (e.g. loading image cube and plotting / computation)
 
 ## How To Launch
 **1**. In your command line and in a directory you want NeutronPy to be in, you first want to clone this repository.  
