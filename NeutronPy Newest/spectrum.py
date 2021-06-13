@@ -9,6 +9,7 @@ from beamline import Beamline
 from image_viewer import ImageViewerWindow
 from materials import Materials
 import numpy as np
+#TODO: multi-thread the plotting function when pressing the button to avoid ANY potential (not responding errors)
 
 class Spectrum(QtWidgets.QWidget):
     def __init__(self, beamline, materials, imageviewer):

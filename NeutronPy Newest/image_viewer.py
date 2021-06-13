@@ -250,6 +250,11 @@ class ImageViewerWindow(QWidget):
             self.z.setMaximum(len(self.files) - 1)
             self.load_new_image(0)
 
+
+            #instantiate the image cube!
+            self.image_cube = []
+
+            
             #loads every image file in the directory into an image cube containing information
             #on each pixel of each slice of data
             #For debugging, looking at the load_new_images method will be helpful as abstractions
@@ -257,7 +262,6 @@ class ImageViewerWindow(QWidget):
             def load_image_cube(progress_callback):
             
                 #Take the data from all the fits files and dump them into an array
-                self.image_cube = []
                 startTimer1 = time.perf_counter()
                 fileLen = len(self.files)
                 for fileNum in range(0, fileLen):
@@ -303,22 +307,14 @@ class ImageViewerWindow(QWidget):
                 self.threadpool.start(cubeThread)
             
             naive_load_data() #In the case runtime becomes an issue, take a look at the compressed_load_data function and implementation
-                              #Similar to naive_load_data(), it has its pros and cons - personally in my opinion, naive_load_data() does better
+                              #Similar to naive_load_data(), it has its pros and cons - personally in my (Yuki's) opinion, naive_load_data() does better
+
+
 
             #Compressed Approach: 
-                #We create a image cube 3D array with NaN values and instantiate them
+                #We create a image cube 3D array with NaN values and instantiate them as we access the ones we desire
             """
             def compressed_load_data():
-                oneSlice = fits.open(self.dir + '/' + self.files[0])[0].data
-                length = len(oneSlice)
-                width = len(oneSlice[0])
-                self.image_cube = np.empty((len(self.files), length, width))
-                self.image_cube[:] = np.NaN
-
-            tic = time.perf_counter()
-            compressed_load_data()
-            toc = time.perf_counter()
-            print(f"Instantiated image_cube in {toc - tic:0.4f} seconds")
             """
 
     # Loads a new image from the image library
