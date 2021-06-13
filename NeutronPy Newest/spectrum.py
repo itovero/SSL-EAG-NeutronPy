@@ -94,7 +94,18 @@ class Spectrum(QtWidgets.QWidget):
         '''
         self.getUpdatedParameters()
 
-        def crossSectionPlot():
+        def crossSectionPlot(figure, sumdata):
+            #Plotting initialization
+            figure.clf()
+            ax3 = figure.add_subplot(111)
+            #The plotting function itself
+            x = [i for i in range(0, len(self.imageviewer.files) - 1)] #len(self.imageviewer.files)
+            y = [sumdata[i] for i in x]
+            ax3.plot(x, y, 'r.-')
+            ax3.set_title('Cross Section (MeV vs Barns)')
+            self.canvas.draw_idle()
+
+            '''
             #Plotting initialization
             self.figure.clf()
             ax3 = self.figure.add_subplot(111)
@@ -104,12 +115,13 @@ class Spectrum(QtWidgets.QWidget):
             ax3.plot(x, y, 'r.-')
             ax3.set_title('Cross Section (MeV vs Barns)')
             self.canvas.draw_idle()
+            '''
 
 
         '''
         Multi-threading functionality
         '''
-        crossThread = plotLoader(crossSectionPlot)
+        crossThread = plotLoader(crossSectionPlot, self.figure, self.sum_image_data)
         self.threadpool.start(crossThread)
 
 
@@ -125,12 +137,12 @@ class Spectrum(QtWidgets.QWidget):
         '''
         self.getUpdatedParameters()
 
-        def AntonPlot():
+        def AntonPlot(figure):
             '''
             Plotting initialization - there will be 2 graphs on the window
             '''
-            self.figure.clf()
-            ax1 = self.figure.add_subplot(211)
+            figure.clf()
+            ax1 = figure.add_subplot(211)
 
             '''
             The plotting function(s) itself (QuickFit)
@@ -146,7 +158,7 @@ class Spectrum(QtWidgets.QWidget):
             ax1.set_title("Experimental Spectrum")
             ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
             ax1.set_ylabel("Transmission")
-            ax2 = self.figure.add_subplot(212)
+            ax2 = figure.add_subplot(212)
             x2 = [i for i in range(100)] #pass the x1, y1 values to here for Anton's method
             #pass anton's method using the global variable fullParameters
             y2 = [3 for i in x2]
@@ -159,7 +171,7 @@ class Spectrum(QtWidgets.QWidget):
         '''
         Multi-threading functionality
         '''
-        antonThread = plotLoader(AntonPlot)
+        antonThread = plotLoader(AntonPlot, self.figure)
         self.threadpool.start(antonThread)
 
 
