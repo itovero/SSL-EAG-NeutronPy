@@ -1,5 +1,5 @@
 #NOTE: self.image_cube is a non-numpy array implementation at the moment!
-
+#TODO: add a z-range selection for plotting certain subsections of the image cube
 
 import sys, traceback
 from os import listdir
@@ -254,7 +254,7 @@ class ImageViewerWindow(QWidget):
             #instantiate the image cube!
             self.image_cube = []
 
-            
+
             #loads every image file in the directory into an image cube containing information
             #on each pixel of each slice of data
             #For debugging, looking at the load_new_images method will be helpful as abstractions
