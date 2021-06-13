@@ -216,6 +216,7 @@ class ImageViewerWindow(QWidget):
 
         #Add the image viewer and scroll bar
         layout = QVBoxLayout(self)
+        vwidget = QWidget(self)
         VB = QVBoxLayout(self)
         VB.addWidget(self.viewer)
         VB.addWidget(self.scroll_bar)
