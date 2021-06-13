@@ -35,8 +35,8 @@ class Progress(QWidget):
         self.progressBar.setAlignment(Qt.AlignCenter)
 
     def startLoadImageCube(self):
-        self.setWindowTitle('Loading Image Cube now...')
-        self.progressBar.setFormat("Loading Image Cube now...")
+        self.setWindowTitle('Loading Image Cube now... (may take a while)')
+        self.progressBar.setFormat("Loading Image Cube now... (may take a while)")
         self.progressBar.setAlignment(Qt.AlignCenter)
 
     def finishLoadImageCube(self, timer):

@@ -43,7 +43,6 @@ class MainWindow(QtWidgets.QMainWindow):
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
-        #print(Beamline().maxE.text())
 
 if __name__ == "__main__":
     import sys

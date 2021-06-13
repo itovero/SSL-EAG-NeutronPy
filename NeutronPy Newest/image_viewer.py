@@ -1,3 +1,6 @@
+#NOTE: self.image_cube is a non-numpy array implementation at the moment!
+
+
 import sys, traceback
 from os import listdir
 from os.path import isfile, join
@@ -18,8 +21,6 @@ class selector(QRubberBand):
         painter = QPainter(self)
         painter.setPen(QPen(Qt.green, 4))
         color = QColor(Qt.green)
-        #painter.setBrush(QBrush(color))
-        #painter.setOpacity(0.3)
         painter.drawRect(event.rect())
 
 
@@ -163,7 +164,6 @@ class ImageViewerWindow(QWidget):
         super().__init__()
         #For multi-threading data loadout
         self.threadpool = QThreadPool()
-        #self.image_cube = []
 
         self.viewer = image_viewer()
         self.files = None
@@ -192,11 +192,6 @@ class ImageViewerWindow(QWidget):
         self.z.setMinimum(0)
         self.z.valueChanged.connect(self.load_new_image_z)
 
-        self.z_interval_label = QLabel("Z Interval")
-        self.z_interval = QSpinBox() #TODO: Delete this Z interval - we don't need this per se anymore
-
-        self.z_interval.setMinimum(1)
-
         #Update values based on changes in both the viewer and the spinboxes
         self.viewer.rect_sig.connect(self.update_xy)
         self.x_min.valueChanged.connect(self.update_rect)
@@ -213,7 +208,7 @@ class ImageViewerWindow(QWidget):
         self.slider.valueChanged.connect(self.load_new_image_scroll_bar)
 
         #Scroll bar
-        self.scroll_bar = QSlider(Qt.Horizontal)#QScrollBar(self)
+        self.scroll_bar = QSlider(Qt.Horizontal)
         self.scroll_bar.setOrientation(Qt.Horizontal)
         self.scroll_bar.setMinimum(0)
         self.scroll_bar.setMaximum(0)
@@ -239,8 +234,6 @@ class ImageViewerWindow(QWidget):
         HB.addWidget(self.y_max)
         HB.addWidget(self.z_label)
         HB.addWidget(self.z)
-        HB.addWidget(self.z_interval_label)
-        HB.addWidget(self.z_interval)
         HB.addWidget(self.slider_label)
         HB.addWidget(self.slider)
         layout.addLayout(VB)
@@ -255,7 +248,6 @@ class ImageViewerWindow(QWidget):
 
             self.scroll_bar.setMaximum(len(self.files) - 1)
             self.z.setMaximum(len(self.files) - 1)
-            self.z_interval.setMaximum(len(self.files) - 1)
             self.load_new_image(0)
 
             #loads every image file in the directory into an image cube containing information
@@ -263,9 +255,7 @@ class ImageViewerWindow(QWidget):
             #For debugging, looking at the load_new_images method will be helpful as abstractions
             #are omitted for this list comprehension to maintain fastest runtime
             def load_image_cube(progress_callback):
-                #TODO initially have it dump into a numpy array
-
-                
+            
                 #Take the data from all the fits files and dump them into an array
                 self.image_cube = []
                 startTimer1 = time.perf_counter()
@@ -281,13 +271,19 @@ class ImageViewerWindow(QWidget):
                 self.loadingBar.finishFits2Array(endTimer1 - startTimer1)
                 time.sleep(2)
 
+
+                '''
                 #Initializing Image Cube into a Numpy Array
                 startTimer2 = time.perf_counter()
                 self.loadingBar.startLoadImageCube()
-                self.image_cube = np.array(self.image_cube) #this apparently takes a long time ~7.6 s for 2600 fits files
+                '''
+                #TODO: uncomment these blocks for other needed operations other than sum
+                #self.image_cube = np.array(self.image_cube) #this apparently takes a long time ~7.6 s for 2600 fits files
+                '''
                 endTimer2 = time.perf_counter()
                 self.loadingBar.finishLoadImageCube(endTimer2 - startTimer2)
                 time.sleep(2)
+                '''
 
                 #Close the loading window
                 self.loadingBar.close()
@@ -395,9 +391,11 @@ class ImageViewerWindow(QWidget):
             #xmin, xmax are the x coordinates of the rectangle user selected; same goes for y
             xmin, xmax, ymin, ymax = self.update_rect()
 
-            def naive_sum_data():
+            def naive_sum_data(): 
                 #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
-                self.sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
+                self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))]
+                #TODO: uncomment these blocks for other needed operations other than sum
+                #self.sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
             
             naive_sum_data()
             
