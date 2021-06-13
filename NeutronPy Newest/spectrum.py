@@ -1,5 +1,6 @@
-import sys
-from PyQt5 import QtWidgets
+import sys, traceback
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import *
 import matplotlib
 import matplotlib.figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -10,6 +11,30 @@ from image_viewer import ImageViewerWindow
 from materials import Materials
 import numpy as np
 #TODO: multi-thread the plotting function when pressing the button to avoid ANY potential (not responding errors)
+#TODO: Don't let it run the plotting function when the arrays are empty (aka when the image cube has not loaded)
+
+class plotLoader(QRunnable):
+    #Separate Thread to handle mutliprocesses 
+    #This one, in particular, deals with assisting the plotting that happens on Button 1 (left)
+    def __init__(self, fn, *args, **kwargs):
+        super(plotLoader, self).__init__()
+        # Store constructor arguments (re-used for processing)
+        #args and kwargs could be the parameters for different functionalities
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+
+    @pyqtSlot()
+    def run(self):
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except: 
+            #Handles exception if there's an issue with loading data
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+
+
+
 
 class Spectrum(QtWidgets.QWidget):
     def __init__(self, beamline, materials, imageviewer):
@@ -21,6 +46,11 @@ class Spectrum(QtWidgets.QWidget):
         self.beamline = beamline
         self.materials = materials
         self.imageviewer = imageviewer
+
+        '''
+        For multi-threading data loadout
+        '''
+        self.threadpool = QThreadPool()
 
 
         super(Spectrum, self).__init__()
@@ -64,22 +94,29 @@ class Spectrum(QtWidgets.QWidget):
         '''
         self.getUpdatedParameters()
 
+        def crossSectionPlot():
+            #Plotting initialization
+            self.figure.clf()
+            ax3 = self.figure.add_subplot(111)
+            #The plotting function itself
+            x = [i for i in range(0, len(self.imageviewer.files) - 1)] #len(self.imageviewer.files)
+            y = [self.sum_image_data[i] for i in x]
+            ax3.plot(x, y, 'r.-')
+            ax3.set_title('Cross Section (MeV vs Barns)')
+            self.canvas.draw_idle()
+
+
         '''
-        Plotting initialization
+        Multi-threading functionality
         '''
-        self.figure.clf()
-        ax3 = self.figure.add_subplot(111)
+        crossThread = plotLoader(crossSectionPlot)
+        self.threadpool.start(crossThread)
+
+
         
-        '''
-        The plotting function itself
-        '''
-        x = [i for i in range(0, len(self.imageviewer.files) - 1)] #len(self.imageviewer.files)
-        y = [self.sum_image_data[i] for i in x]
         
         
-        ax3.plot(x, y, 'r.-')
-        ax3.set_title('Cross Section (MeV vs Barns)')
-        self.canvas.draw_idle()
+        
 
     def AntonCode(self):
         '''
@@ -88,40 +125,42 @@ class Spectrum(QtWidgets.QWidget):
         '''
         self.getUpdatedParameters()
 
-        '''
-        Plotting initialization - there will be 2 graphs on the window
-        '''
-        self.figure.clf()
-        ax1 = self.figure.add_subplot(211)
+        def AntonPlot():
+            '''
+            Plotting initialization - there will be 2 graphs on the window
+            '''
+            self.figure.clf()
+            ax1 = self.figure.add_subplot(211)
+
+            '''
+            The plotting function(s) itself (QuickFit)
+            As we are plotting multiple functions in one graph
+            '''    
+            #TODO: Implemenet Anton's codebase onto the graph using sum_image_data
+            x1 = [i for i in range(200)]
+            y1 = [2 for i in x1]
+            x1_1 = [i for i in range(200)]
+            y1_1 = np.sin(x1_1)
+            ax1.plot(x1, y1, 'b.-')
+            ax1.plot(x1_1, y1_1)
+            ax1.set_title("Experimental Spectrum")
+            ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
+            ax1.set_ylabel("Transmission")
+            ax2 = self.figure.add_subplot(212)
+            x2 = [i for i in range(100)] #pass the x1, y1 values to here for Anton's method
+            #pass anton's method using the global variable fullParameters
+            y2 = [3 for i in x2]
+            ax2.plot(x2, y2, 'b.-')
+            self.canvas.draw_idle()
+            ax2.set_title('Fitting')
+            ax2.set_xlabel("Energy / Time")
+            ax2.set_ylabel("Transmission")
 
         '''
-        The plotting function(s) itself (QuickFit)
-        As we are plotting multiple functions in one graph
-        '''    
-        #TODO: Implemenet Anton's codebase onto the graph using sum_image_data
-        x1 = [i for i in range(200)]
-        y1 = [2 for i in x1]
-
-        x1_1 = [i for i in range(200)]
-        y1_1 = np.sin(x1_1)
-        ax1.plot(x1, y1, 'b.-')
-        ax1.plot(x1_1, y1_1)
-        ax1.set_title("Experimental Spectrum")
-        ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
-        ax1.set_ylabel("Transmission")
-        ax2 = self.figure.add_subplot(212)
-
-
-        x2 = [i for i in range(100)] #pass the x1, y1 values to here for Anton's method
-
-        #pass anton's method using the global variable fullParameters
-        y2 = [3 for i in x2]
-
-        ax2.plot(x2, y2, 'b.-')
-        self.canvas.draw_idle()
-        ax2.set_title('Fitting')
-        ax2.set_xlabel("Energy / Time")
-        ax2.set_ylabel("Transmission")
+        Multi-threading functionality
+        '''
+        antonThread = plotLoader(AntonPlot)
+        self.threadpool.start(antonThread)
 
 
     def center(self):

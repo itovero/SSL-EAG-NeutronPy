@@ -273,7 +273,7 @@ class ImageViewerWindow(QWidget):
                 endTimer1 = time.perf_counter()
                 progress_callback.emit(100)
                 self.loadingBar.finishFits2Array(endTimer1 - startTimer1)
-                time.sleep(2)
+                time.sleep(1.5)
 
 
                 '''
@@ -281,7 +281,7 @@ class ImageViewerWindow(QWidget):
                 startTimer2 = time.perf_counter()
                 self.loadingBar.startLoadImageCube()
                 '''
-                #TODO: uncomment these blocks for other needed operations other than sum
+                #NOTE: uncomment these blocks for other needed operations other than sum
                 #self.image_cube = np.array(self.image_cube) #this apparently takes a long time ~7.6 s for 2600 fits files
                 '''
                 endTimer2 = time.perf_counter()
@@ -390,7 +390,7 @@ class ImageViewerWindow(QWidget):
             def naive_sum_data(): 
                 #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
                 self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))]
-                #TODO: uncomment these blocks for other needed operations other than sum
+                #NOTE: uncomment these blocks for other needed operations other than sum
                 #self.sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
             
             naive_sum_data()
