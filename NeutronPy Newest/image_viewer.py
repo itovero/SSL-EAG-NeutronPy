@@ -2,7 +2,7 @@
 #TODO: add a z-range selection for plotting certain subsections of the image cube
 
 import sys, traceback
-from os import listdir
+from os import listdir, path
 from os.path import isfile, join
 from astropy.io import fits
 import numpy as np
@@ -31,7 +31,7 @@ class ImageCubeLoadSignal(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
     result = pyqtSignal(object)
-    progress = pyqtSignal(int)
+    progress = pyqtSignal(int, int, float)
 
 class ImageCubeLoader(QRunnable):
     #Separate Thread to handle mutliprocesses 
@@ -244,7 +244,7 @@ class ImageViewerWindow(QWidget):
         self.dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
 
         #TODO Fix the FileNotFoundError when clicking cancel
-        if dir != '': 
+        if path.isdir(self.dir): 
             self.files = listdir(self.dir)
 
             self.scroll_bar.setMaximum(len(self.files) - 1)
@@ -270,10 +270,11 @@ class ImageViewerWindow(QWidget):
                         self.image_cube.append(hdul[0].data)
                         del hdul[0].data
                         if (fileNum - 1) * 100 // fileLen  != fileNum * 100 // fileLen:
-                            progress_callback.emit(fileNum / fileLen * 100)
+                            progress_callback.emit(fileNum / fileLen * 100, 1, 0)
                 endTimer1 = time.perf_counter()
-                progress_callback.emit(100)
-                self.loadingBar.finishFits2Array(endTimer1 - startTimer1)
+                progress_callback.emit(100, 1, 0)
+                time.sleep(.5)
+                progress_callback.emit(100, 2, endTimer1 - startTimer1)
                 time.sleep(1.5)
 
 
@@ -291,11 +292,13 @@ class ImageViewerWindow(QWidget):
                 '''
 
                 #Close the loading window
-                self.loadingBar.close()
+                progress_callback.emit(100, 4, 0)
             
+            '''
             def progress_fn(n):
                 #   print("%d%% done" % n)
                 self.loadingBar.setValue(n)
+            '''
 
             #Naive Approach: This method literally takes in all the pixel arrays found on the fits file and shoves them into an image_cube
                 #Pros: This method is great as the runtime of you selecting a region and computing the sum becomes way faster beacause it took everything in from the beginning
@@ -304,7 +307,7 @@ class ImageViewerWindow(QWidget):
                 #loading bar
                 self.loadingBar = Progress()
                 cubeThread = ImageCubeLoader(load_image_cube)
-                cubeThread.signals.progress.connect(progress_fn)
+                cubeThread.signals.progress.connect(self.loadingBar.setValue)
                 self.threadpool.start(cubeThread)
             
             naive_load_data() #In the case runtime becomes an issue, take a look at the compressed_load_data function and implementation
