@@ -281,19 +281,22 @@ class ImageViewerWindow(QWidget):
                 '''
                 #Initializing Image Cube into a Numpy Array
                 startTimer2 = time.perf_counter()
-                self.loadingBar.startLoadImageCube()
+                progress_callback.emit(100, 3, 0)
                 '''
+                
                 #NOTE: uncomment these blocks for other needed operations other than sum
                 #self.image_cube = np.array(self.image_cube) #this apparently takes a long time ~7.6 s for 2600 fits files
+                
                 '''
                 endTimer2 = time.perf_counter()
-                self.loadingBar.finishLoadImageCube(endTimer2 - startTimer2)
+                progress_callback.emit(100, 4, endTimer2 - startTimer2)
                 time.sleep(2)
                 '''
-
+                
                 #Close the loading window
-                progress_callback.emit(100, 4, 0)
+                progress_callback.emit(100, 5, 0)
             
+            #This fnction is no longer necessary, setValue is triggered by progress_callback.emit directly
             '''
             def progress_fn(n):
                 #   print("%d%% done" % n)

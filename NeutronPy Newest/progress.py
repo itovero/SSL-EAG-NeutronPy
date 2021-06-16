@@ -29,7 +29,11 @@ class Progress(QWidget):
                 #self.setWindowTitle(f'Complete! Finishing loading data in {toc - tic:0.4f} seconds')
         elif runtime == 2:
             self.finishFits2Array(timer)
+        elif runtime == 3: 
+            self.startLoadImageCube()
         elif runtime == 4:
+            self.finishLoadImageCube(timer)
+        elif runtime == 5:
             self.closePopup()
 
     #Couple of helper functions to update states
