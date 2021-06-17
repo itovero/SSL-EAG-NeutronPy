@@ -10,8 +10,6 @@ from beamline import Beamline
 from image_viewer import ImageViewerWindow
 from materials import Materials
 import numpy as np
-#TODO: multi-thread the plotting function when pressing the button to avoid ANY potential (not responding errors)
-#TODO: Don't let it run the plotting function when the arrays are empty (aka when the image cube has not loaded)
 
 class plotLoader(QRunnable):
     #Separate Thread to handle mutliprocesses 
@@ -81,6 +79,11 @@ class Spectrum(QtWidgets.QWidget):
         btn2.clicked.connect(self.AntonCode)
         grid.addWidget(btn2, 5, 1)
 
+        btn3 = QtWidgets.QPushButton('Plot 3: Converging Fit', self)
+        btn3.resize(btn3.sizeHint())
+        btn3.clicked.connect(self.ConvergeFit)
+        grid.addWidget(btn3, 5, 2)
+
         self.figure = matplotlib.figure.Figure()
         self.canvas = FigureCanvas(self.figure)
         grid.addWidget(self.canvas, 3, 0, 1, 2)
@@ -142,7 +145,7 @@ class Spectrum(QtWidgets.QWidget):
             Plotting initialization - there will be 2 graphs on the window
             '''
             figure.clf()
-            ax1 = figure.add_subplot(211)
+            ax1 = figure.add_subplot(111)
 
             '''
             The plotting function(s) itself (QuickFit)
@@ -158,21 +161,49 @@ class Spectrum(QtWidgets.QWidget):
             ax1.set_title("Experimental Spectrum")
             ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
             ax1.set_ylabel("Transmission")
-            ax2 = figure.add_subplot(212)
-            x2 = [i for i in range(100)] #pass the x1, y1 values to here for Anton's method
-            #pass anton's method using the global variable fullParameters
-            y2 = [3 for i in x2]
-            ax2.plot(x2, y2, 'b.-')
             self.canvas.draw_idle()
-            ax2.set_title('Fitting')
-            ax2.set_xlabel("Energy / Time")
-            ax2.set_ylabel("Transmission")
 
         '''
         Multi-threading functionality
         '''
         antonThread = plotLoader(AntonPlot, self.figure)
         self.threadpool.start(antonThread)
+
+    def ConvergeFit(self):
+        '''
+        Obtaining the updated parameter inputs from beamline, materials, 
+        and imageviewer
+        '''
+        self.getUpdatedParameters()
+
+        def ConvergePlot(figure):
+            '''
+            Plotting initialization - there will be 2 graphs on the window
+            '''
+            figure.clf()
+            ax1 = figure.add_subplot(111)
+
+            '''
+            The plotting function(s) itself (QuickFit)
+            As we are plotting multiple functions in one graph
+            '''    
+            #TODO: Implemenet Anton's codebase onto the graph using sum_image_data
+            x1 = [i for i in range(200)]
+            y1 = [2 for i in x1]
+            x1_1 = [i for i in range(200)]
+            y1_1 = np.cos(x1_1)
+            ax1.plot(x1, y1, 'b.-')
+            ax1.plot(x1_1, y1_1)
+            ax1.set_title("Experimental Spectrum")
+            ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
+            ax1.set_ylabel("Transmission")
+            self.canvas.draw_idle()
+
+        '''
+        Multi-threading functionality
+        '''
+        convergeThread = plotLoader(ConvergePlot, self.figure)
+        self.threadpool.start(convergeThread)
 
 
     def center(self):
