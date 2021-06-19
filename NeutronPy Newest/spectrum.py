@@ -6,6 +6,7 @@ from beamline import Beamline
 from image_viewer import ImageViewerWindow
 from materials import Materials
 import numpy as np
+from error_page import Error
 
 #Graphing modules
 from matplotlib.figure import Figure
@@ -128,7 +129,9 @@ class Spectrum(QtWidgets.QWidget):
             crossThread = plotLoader(crossSectionPlot, self.canvas, self.sum_image_data)
             self.threadpool.start(crossThread)
         except:
-            print("Image Cube not defined!") #TODO: Insert qdialog for error window here
+            self.error = Error("Sample Data Not Yet Selected for Plotting")
+            self.error.show()
+
 
     def AntonCode(self):
         def AntonPlot(canvas):
@@ -167,7 +170,9 @@ class Spectrum(QtWidgets.QWidget):
         except:
             antonThread = plotLoader(AntonPlot, self.canvas)
             self.threadpool.start(antonThread)
-            print("Image Cube not defined!") #TODO: Insert qdialog for error window here
+
+            self.error = Error("Sample Data Not Yet Selected for Plotting")
+            self.error.show()
 
     def ConvergeFit(self):
         def ConvergePlot(canvas):
@@ -206,7 +211,9 @@ class Spectrum(QtWidgets.QWidget):
         except:
             convergeThread = plotLoader(ConvergePlot, self.canvas)
             self.threadpool.start(convergeThread)
-            print("Image Cube not defined!") #TODO: Insert qdialog for error window here
+            
+            self.error = Error("Sample Data Not Yet Selected for Plotting")
+            self.error.show()
 
     def center(self):
         qr = self.frameGeometry()
