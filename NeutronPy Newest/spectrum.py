@@ -1,15 +1,25 @@
 import sys, traceback
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import *
-import matplotlib
-import matplotlib.figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import pandas as pd
 from beamline import Beamline
 from image_viewer import ImageViewerWindow
 from materials import Materials
 import numpy as np
+
+#Graphing modules
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.qt_compat import QtCore, QtWidgets
+if QtCore.qVersion() >= "5.":
+    from matplotlib.backends.backend_qt5agg import (
+        FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+else:
+    from matplotlib.backends.backend_qt4agg import (
+        FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+
+
 
 class plotLoader(QRunnable):
     #Separate Thread to handle mutliprocesses 
@@ -35,7 +45,7 @@ class plotLoader(QRunnable):
 
 
 class Spectrum(QtWidgets.QWidget):
-    def __init__(self, beamline, materials, imageviewer):
+    def __init__(self, beamline = None, materials = None, imageviewer = None):
         '''
         The Spectrum takes in the instances of beamline, materials, and 
         imageviewer created in main.py. This is to track the variables of inputs
@@ -84,23 +94,26 @@ class Spectrum(QtWidgets.QWidget):
         btn3.clicked.connect(self.ConvergeFit)
         grid.addWidget(btn3, 5, 2)
 
-        self.figure = matplotlib.figure.Figure()
+        self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         grid.addWidget(self.canvas, 3, 0, 1, 2)
-
-        #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
+        
+        self.toolbar = QtWidgets.QToolBar()
+        self.toolbar.addWidget(NavigationToolbar(self.canvas, self))
+        grid.setMenuBar(self.toolbar)
+        #self.show() #- UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
     def crossSectionalData(self):
-        def crossSectionPlot(figure, sumdata):
+        def crossSectionPlot(canvas, sumdata):
             #Plotting initialization
-            figure.clf()
-            ax3 = figure.add_subplot(111)
+            self.figure.clear()
+            ax3 = canvas.figure.subplots()
             #The plotting function itself
             x = [i for i in range(0, len(self.imageviewer.files) - 1)] #len(self.imageviewer.files)
             y = [sumdata[i] for i in x]
             ax3.plot(x, y, 'r.-')
             ax3.set_title('Cross Section (MeV vs Barns)')
-            self.canvas.draw_idle()
+            canvas.draw_idle()
 
         try:
             '''
@@ -112,18 +125,18 @@ class Spectrum(QtWidgets.QWidget):
             '''
             Multi-threading functionality
             '''
-            crossThread = plotLoader(crossSectionPlot, self.figure, self.sum_image_data)
+            crossThread = plotLoader(crossSectionPlot, self.canvas, self.sum_image_data)
             self.threadpool.start(crossThread)
         except:
             print("Image Cube not defined!") #TODO: Insert qdialog for error window here
 
     def AntonCode(self):
-        def AntonPlot(figure):
+        def AntonPlot(canvas):
             '''
-            Plotting initialization - there will be 2 graphs on the window
+            Plotting initialization
             '''
-            figure.clf()
-            ax1 = figure.add_subplot(111)
+            self.figure.clear()
+            ax1 = canvas.figure.subplots()
 
             '''
             The plotting function(s) itself (QuickFit)
@@ -139,7 +152,7 @@ class Spectrum(QtWidgets.QWidget):
             ax1.set_title("Experimental Spectrum")
             ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
             ax1.set_ylabel("Transmission")
-            self.canvas.draw_idle()
+            canvas.draw_idle()
         try:
             '''
             Obtaining the updated parameter inputs from beamline, materials, 
@@ -149,18 +162,20 @@ class Spectrum(QtWidgets.QWidget):
             '''
             Multi-threading functionality
             '''
-            antonThread = plotLoader(AntonPlot, self.figure)
+            antonThread = plotLoader(AntonPlot, self.canvas)
             self.threadpool.start(antonThread)
         except:
+            antonThread = plotLoader(AntonPlot, self.canvas)
+            self.threadpool.start(antonThread)
             print("Image Cube not defined!") #TODO: Insert qdialog for error window here
 
     def ConvergeFit(self):
-        def ConvergePlot(figure):
+        def ConvergePlot(canvas):
             '''
             Plotting initialization - there will be 2 graphs on the window
             '''
-            figure.clf()
-            ax1 = figure.add_subplot(111)
+            self.figure.clear()
+            ax1 = canvas.figure.subplots()
 
             '''
             The plotting function(s) itself (QuickFit)
@@ -176,7 +191,7 @@ class Spectrum(QtWidgets.QWidget):
             ax1.set_title("Experimental Spectrum")
             ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
             ax1.set_ylabel("Transmission")
-            self.canvas.draw_idle()
+            canvas.draw_idle()
         try:
             '''
             Obtaining the updated parameter inputs from beamline, materials, 
@@ -186,7 +201,7 @@ class Spectrum(QtWidgets.QWidget):
             '''
             Multi-threading functionality
             '''
-            convergeThread = plotLoader(ConvergePlot, self.figure)
+            convergeThread = plotLoader(ConvergePlot, self.canvas)
             self.threadpool.start(convergeThread)
         except:
             print("Image Cube not defined!") #TODO: Insert qdialog for error window here

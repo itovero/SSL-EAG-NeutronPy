@@ -247,7 +247,7 @@ class ImageViewerWindow(QWidget):
         layout.addLayout(HB)
     
     def loadsample_dir(self):
-        self.dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.dir = str(QFileDialog.getExistingDirectory(self, "Select Sample Data Directory"))
 
         if path.isdir(self.dir): 
             self.files = listdir(self.dir)
@@ -323,7 +323,7 @@ class ImageViewerWindow(QWidget):
             """
 
     def loadopenbeam_dir(self): #Almost identical to sample data file select therefore many comments are omitted
-        self.beam_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.beam_dir = str(QFileDialog.getExistingDirectory(self, "Select OpenBeam Directory"))
 
         if path.isdir(self.beam_dir): 
             self.beam_files = listdir(self.beam_dir)
@@ -423,10 +423,17 @@ class ImageViewerWindow(QWidget):
             xmin, xmax, ymin, ymax = self.update_rect()
 
             def naive_sum_data(): 
-                #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
-                self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))]
-                #NOTE: uncomment these blocks for other needed operations other than sum
-                #self.sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
+                try: #When we have both open beam data set and sample data image cube
+                    self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax] / (self.openbeam_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))]
+                    #TODO: This runs into runtime warning of dividing by zero - fix that!
+
+                except: #When we don't have an open beam data set
+                    #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
+                    self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))]
+                    
+                    
+                    #NOTE: uncomment these blocks for other needed operations other than sum
+                    #self.sumImageCube = np.array([np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))])
             
             naive_sum_data()
             
