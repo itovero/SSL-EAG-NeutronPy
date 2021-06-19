@@ -169,10 +169,15 @@ class ImageViewerWindow(QWidget):
         self.files = None
         self.dir = "."
 
-        #Load button: Opens directory selection
-        self.load_button = QToolButton(self)
-        self.load_button.setText('Select File/Directory')
-        self.load_button.clicked.connect(self.load_dir)
+        #Load button: Opens directory selection for Sample Data
+        self.loadsample_button = QToolButton(self)
+        self.loadsample_button.setText('Select Sample Data')
+        self.loadsample_button.clicked.connect(self.loadsample_dir)
+
+        #Load button: Opens directory selection for Sample Data
+        self.loadopenbeam_button = QToolButton(self)
+        self.loadopenbeam_button.setText('Select Open Beam Data')
+        self.loadopenbeam_button.clicked.connect(self.loadopenbeam_dir)
 
         #Coordinates of the selection rectangle and their labels
         self.x_min_label = QLabel("X Min")
@@ -224,7 +229,8 @@ class ImageViewerWindow(QWidget):
         #Add the coordinates and the get file button
         HB = QVBoxLayout(self)
         HB.setAlignment(Qt.AlignLeft)
-        HB.addWidget(self.load_button)
+        HB.addWidget(self.loadsample_button)
+        HB.addWidget(self.loadopenbeam_button)
         HB.addWidget(self.x_min_label)
         HB.addWidget(self.x_min)
         HB.addWidget(self.x_max_label)
@@ -240,10 +246,9 @@ class ImageViewerWindow(QWidget):
         layout.addLayout(VB)
         layout.addLayout(HB)
     
-    def load_dir(self):
+    def loadsample_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
 
-        #TODO Fix the FileNotFoundError when clicking cancel
         if path.isdir(self.dir): 
             self.files = listdir(self.dir)
 
@@ -295,13 +300,6 @@ class ImageViewerWindow(QWidget):
                 
                 #Close the loading window
                 progress_callback.emit(100, 5, 0)
-            
-            #This fnction is no longer necessary, setValue is triggered by progress_callback.emit directly
-            '''
-            def progress_fn(n):
-                #   print("%d%% done" % n)
-                self.loadingBar.setValue(n)
-            '''
 
             #Naive Approach: This method literally takes in all the pixel arrays found on the fits file and shoves them into an image_cube
                 #Pros: This method is great as the runtime of you selecting a region and computing the sum becomes way faster beacause it took everything in from the beginning
@@ -323,6 +321,36 @@ class ImageViewerWindow(QWidget):
             """
             def compressed_load_data():
             """
+
+    def loadopenbeam_dir(self): #Almost identical to sample data file select therefore many comments are omitted
+        self.beam_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+
+        if path.isdir(self.beam_dir): 
+            self.beam_files = listdir(self.beam_dir)
+            self.openbeam_image_cube = []
+            def load_image_cube(progress_callback):
+            
+                #Take the data from all the fits files and dump them into an array
+                startTimer1 = time.perf_counter()
+                fileLen = len(self.beam_files)
+                for fileNum in range(0, fileLen):
+                    with fits.open(self.beam_dir + '/' + self.beam_files[fileNum], memmap = True) as hdul:
+                        self.openbeam_image_cube.append(hdul[0].data)
+                        del hdul[0].data
+                        if (fileNum - 1) * 100 // fileLen  != fileNum * 100 // fileLen:
+                            progress_callback.emit(fileNum / fileLen * 100, 1, 0)
+                endTimer1 = time.perf_counter()
+                progress_callback.emit(100, 1, 0)
+                time.sleep(.5)
+                progress_callback.emit(100, 2, endTimer1 - startTimer1)
+                time.sleep(1.5)
+                progress_callback.emit(100, 5, 0)
+            def naive_load_data():
+                self.loadingBar = Progress()
+                cubeThread = ImageCubeLoader(load_image_cube)
+                cubeThread.signals.progress.connect(self.loadingBar.setValue)
+                self.threadpool.start(cubeThread)
+            naive_load_data()
 
     # Loads a new image from the image library
     #   This load_new_image is only for the image viewing purposes - it only loads and 

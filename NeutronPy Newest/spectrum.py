@@ -91,12 +91,6 @@ class Spectrum(QtWidgets.QWidget):
         #self.show() - UNCOMMENT THIS LINE FOR SELF DEBUGGING
 
     def crossSectionalData(self):
-        '''
-        Obtaining the updated parameter inputs from beamline, materials, 
-        and imageviewer
-        '''
-        self.getUpdatedParameters()
-
         def crossSectionPlot(figure, sumdata):
             #Plotting initialization
             figure.clf()
@@ -108,38 +102,22 @@ class Spectrum(QtWidgets.QWidget):
             ax3.set_title('Cross Section (MeV vs Barns)')
             self.canvas.draw_idle()
 
+        try:
             '''
-            #Plotting initialization
-            self.figure.clf()
-            ax3 = self.figure.add_subplot(111)
-            #The plotting function itself
-            x = [i for i in range(0, len(self.imageviewer.files) - 1)] #len(self.imageviewer.files)
-            y = [self.sum_image_data[i] for i in x]
-            ax3.plot(x, y, 'r.-')
-            ax3.set_title('Cross Section (MeV vs Barns)')
-            self.canvas.draw_idle()
+            Obtaining the updated parameter inputs from beamline, materials, 
+            and imageviewer
             '''
+            self.getUpdatedParameters()
 
-
-        '''
-        Multi-threading functionality
-        '''
-        crossThread = plotLoader(crossSectionPlot, self.figure, self.sum_image_data)
-        self.threadpool.start(crossThread)
-
-
-        
-        
-        
-        
+            '''
+            Multi-threading functionality
+            '''
+            crossThread = plotLoader(crossSectionPlot, self.figure, self.sum_image_data)
+            self.threadpool.start(crossThread)
+        except:
+            print("Image Cube not defined!") #TODO: Insert qdialog for error window here
 
     def AntonCode(self):
-        '''
-        Obtaining the updated parameter inputs from beamline, materials, 
-        and imageviewer
-        '''
-        self.getUpdatedParameters()
-
         def AntonPlot(figure):
             '''
             Plotting initialization - there will be 2 graphs on the window
@@ -162,20 +140,21 @@ class Spectrum(QtWidgets.QWidget):
             ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
             ax1.set_ylabel("Transmission")
             self.canvas.draw_idle()
-
-        '''
-        Multi-threading functionality
-        '''
-        antonThread = plotLoader(AntonPlot, self.figure)
-        self.threadpool.start(antonThread)
+        try:
+            '''
+            Obtaining the updated parameter inputs from beamline, materials, 
+            and imageviewer
+            '''
+            self.getUpdatedParameters()
+            '''
+            Multi-threading functionality
+            '''
+            antonThread = plotLoader(AntonPlot, self.figure)
+            self.threadpool.start(antonThread)
+        except:
+            print("Image Cube not defined!") #TODO: Insert qdialog for error window here
 
     def ConvergeFit(self):
-        '''
-        Obtaining the updated parameter inputs from beamline, materials, 
-        and imageviewer
-        '''
-        self.getUpdatedParameters()
-
         def ConvergePlot(figure):
             '''
             Plotting initialization - there will be 2 graphs on the window
@@ -198,13 +177,19 @@ class Spectrum(QtWidgets.QWidget):
             ax1.set_xlabel("Energy / Time") #Energy, Time, or Wavelength - depending on how the user picks it
             ax1.set_ylabel("Transmission")
             self.canvas.draw_idle()
-
-        '''
-        Multi-threading functionality
-        '''
-        convergeThread = plotLoader(ConvergePlot, self.figure)
-        self.threadpool.start(convergeThread)
-
+        try:
+            '''
+            Obtaining the updated parameter inputs from beamline, materials, 
+            and imageviewer
+            '''
+            self.getUpdatedParameters()
+            '''
+            Multi-threading functionality
+            '''
+            convergeThread = plotLoader(ConvergePlot, self.figure)
+            self.threadpool.start(convergeThread)
+        except:
+            print("Image Cube not defined!") #TODO: Insert qdialog for error window here
 
     def center(self):
         qr = self.frameGeometry()
