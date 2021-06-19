@@ -8,7 +8,6 @@ from materials import Materials
 from image_viewer import ImageViewerWindow
 import os
 import ctypes
-from progress import Progress
 
 class MainWindow(QtWidgets.QMainWindow):
 

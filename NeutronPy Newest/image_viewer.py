@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from progress import Progress
+from progress_bar import Progress
 
 class selector(QRubberBand):
     def __init__(self, *arg, **kwargs):

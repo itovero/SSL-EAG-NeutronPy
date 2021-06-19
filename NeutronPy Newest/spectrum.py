@@ -204,6 +204,8 @@ class Spectrum(QtWidgets.QWidget):
             convergeThread = plotLoader(ConvergePlot, self.canvas)
             self.threadpool.start(convergeThread)
         except:
+            convergeThread = plotLoader(ConvergePlot, self.canvas)
+            self.threadpool.start(convergeThread)
             print("Image Cube not defined!") #TODO: Insert qdialog for error window here
 
     def center(self):
