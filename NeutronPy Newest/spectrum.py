@@ -69,7 +69,7 @@ class Spectrum(QtWidgets.QWidget):
         '''
         The UI initialization
         '''
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 960, 600)
         self.center()
 
         grid = QtWidgets.QGridLayout()
@@ -80,24 +80,21 @@ class Spectrum(QtWidgets.QWidget):
         We connect the pressing of the buttons to crossSectionalData 
         and AntonCode function for plotting
         '''
-        btn1 = QtWidgets.QPushButton('Plot 1: Cross Section (MeV vs Barns) ', self)
-        btn1.resize(btn1.sizeHint())
+        btn1 = QtWidgets.QPushButton('Cross Section (MeV vs Barns) ', self)
         btn1.clicked.connect(self.crossSectionalData)
         grid.addWidget(btn1, 5, 0)
 
-        btn2 = QtWidgets.QPushButton('Plot 2: Spectra (Transmission vs Energy)', self)
-        btn2.resize(btn2.sizeHint())
+        btn2 = QtWidgets.QPushButton('Spectra (Transmission vs Energy)', self)
         btn2.clicked.connect(self.AntonCode)
         grid.addWidget(btn2, 5, 1)
 
-        btn3 = QtWidgets.QPushButton('Plot 3: Converging Fit', self)
-        btn3.resize(btn3.sizeHint())
+        btn3 = QtWidgets.QPushButton('Converging Fit', self)
         btn3.clicked.connect(self.ConvergeFit)
         grid.addWidget(btn3, 5, 2)
 
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
-        grid.addWidget(self.canvas, 3, 0, 1, 2)
+        grid.addWidget(self.canvas, 3, 0, 1, 3)
         
         self.toolbar = QtWidgets.QToolBar()
         self.toolbar.addWidget(NavigationToolbar(self.canvas, self))
@@ -230,8 +227,7 @@ class Spectrum(QtWidgets.QWidget):
         '''
 
         '''IMAGEVIEWER INPUT'''
-        self.imageviewerInput = self.imageviewer.saveInput()
-        #imageviwerInput = [[xmin, xmax], [ymin, ymax], z, sum_image_data]
+        self.imageviewerInput = self.imageviewer.saveInput() #imageviwerInput = [[xmin, xmax], [ymin, ymax], z, sum_image_data]
 
         self.xmin = self.imageviewerInput[0][0]
         self.xmax = self.imageviewerInput[0][1]
@@ -243,8 +239,7 @@ class Spectrum(QtWidgets.QWidget):
 
 
         '''BEAMLINE INPUT'''
-        self.beamlineInput = self.beamline.saveInput()
-        #beamlineInput = [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
+        self.beamlineInput = self.beamline.saveInput() #beamlineInput = [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
 
         self.flightPath =  self.beamlineInput[0] #1 Flight Path: L (meters)
         self.delayOnTrigger = self.beamlineInput[1] #2 Delay on trigger: dT (miliseconds)
@@ -253,8 +248,7 @@ class Spectrum(QtWidgets.QWidget):
 
 
         '''MATERIALS INPUT'''
-        self.materialsInput = self.materials.saveInput()
-        #materialsInput is a pandas frame with the structure shown below:
+        self.materialsInput = self.materials.saveInput() #materialsInput is a pandas frame with the structure shown below:
         '''
                     Element Name | Abundance | Atomic Mass | Atomic Fraction | Density | Thickness | Component 
         Material 1
