@@ -47,7 +47,6 @@ class ImageCubeLoader(QRunnable):
         self.kwargs['progress_callback'] = self.signals.progress
 
     
-
     @pyqtSlot()
     def run(self):
         try:
@@ -177,11 +176,13 @@ class ImageViewerWindow(QWidget):
         self.loadsample_button = QToolButton(self)
         self.loadsample_button.setText('Select Sample Data')
         self.loadsample_button.clicked.connect(self.loadsample_dir)
+        self.sampledirnamelabel = QLabel("None Selected")
 
         #Load button: Opens directory selection for Sample Data
         self.loadopenbeam_button = QToolButton(self)
         self.loadopenbeam_button.setText('Select OpenBeam Data')
         self.loadopenbeam_button.clicked.connect(self.loadopenbeam_dir)
+        self.openbeamdirnamelabel = QLabel("None Selected")
 
         #Backcoef value
         self.backcoef_label = QLabel("Backcoef")
@@ -255,8 +256,10 @@ class ImageViewerWindow(QWidget):
         fileLayout = QGridLayout(self)
         fileLayout.setAlignment(Qt.AlignLeft)
         fileLayout.addWidget(self.loadsample_button, 1, 0)
+        fileLayout.addWidget(self.sampledirnamelabel, 1, 1)
         fileLayout.addWidget(self.loadopenbeam_button, 2, 0)
-        fileSelectRow.addLayout(fileLayout, 10) 
+        fileLayout.addWidget(self.openbeamdirnamelabel, 2, 1)
+        fileSelectRow.addLayout(fileLayout, 60) 
 
         CoefLayout = QGridLayout(self)
         CoefLayout.addWidget(self.backcoef_label, 1, 0)
@@ -314,6 +317,11 @@ class ImageViewerWindow(QWidget):
 
         if path.isdir(self.dir): 
             self.files = listdir(self.dir)
+
+            pathArr = self.dir.split('/')
+            self.sampledirnamelabel.setText(pathArr[-1])
+            self.sampledirnamelabel.setStyleSheet("border: 1px solid black;")
+            self.sampledirnamelabel.adjustSize()
 
             self.scroll_bar.setMaximum(len(self.files) - 1)
             self.z.setMaximum(len(self.files) - 1)
@@ -400,6 +408,12 @@ class ImageViewerWindow(QWidget):
         if path.isdir(self.beam_dir): 
             self.beam_files = listdir(self.beam_dir)
             self.openbeam_image_cube = []
+
+            pathArr = self.beam_dir.split('/')
+            self.openbeamdirnamelabel.setText(pathArr[-1])
+            self.openbeamdirnamelabel.setStyleSheet("border: 1px solid black;")
+            self.openbeamdirnamelabel.adjustSize()
+
             def load_image_cube(progress_callback):
             
                 #Take the data from all the fits files and dump them into an array
