@@ -85,6 +85,7 @@ class image_viewer(QGraphicsView):
         self.rect_change = False
         self.rect_exists = False
 
+
     def show_photo(self):
         rect = QtCore.QRectF(self.photo.pixmap().rect())
         self.setSceneRect(rect)
@@ -158,6 +159,9 @@ class image_viewer(QGraphicsView):
     def resizeEvent(self, event):
         self.update_rect()
         QGraphicsView.resizeEvent(self, event)
+
+    # def showFileName(self, sampleFileName, openBeamDirectory = "None"):
+    #     self.scene.addWidget(QLabel(sampleFileName + "          Open Beam:"  + openBeamDirectory))
 
 class ImageViewerWindow(QWidget):
     def __init__(self):
@@ -452,6 +456,7 @@ class ImageViewerWindow(QWidget):
     # Changed the value of  z to obtain next image
     def load_new_image_z(self):
         value = self.z.value()
+        #self.viewer.showFileName(self.dir)
         self.scroll_bar.setValue(value)
         self.load_new_image(value)
 
