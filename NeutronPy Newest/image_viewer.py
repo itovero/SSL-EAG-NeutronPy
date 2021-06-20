@@ -492,7 +492,7 @@ class ImageViewerWindow(QWidget):
 
 
     #Save Input function for main.py integration
-    def saveInput(self):
+    def saveInput(self): #returns = [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube]
 
         try:
             #backcoef
@@ -509,12 +509,12 @@ class ImageViewerWindow(QWidget):
 
             def naive_sum_data(): 
                 try: #When we have both open beam data set and sample data image cube
-                    self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax] / (self.openbeam_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))]
-                    #TODO: This runs into runtime warning of dividing by zero - fix that!
+                    self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax] / (self.openbeam_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(z_start, z_end + 1)]
+                    #TODO: This runs into runtime warning of dividing by zero - fix that! Also add operations with normalization coef
 
                 except: #When we don't have an open beam data set
                     #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
-                    self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(0, len(self.image_cube))]
+                    self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(z_start, z_end + 1)]
                     
                     
                     #NOTE: uncomment these blocks for other needed operations other than sum
@@ -529,7 +529,7 @@ class ImageViewerWindow(QWidget):
             print("ymin: " + str(ymin) + " ymax: " + str(ymax))
             print("z start: " + str(z_start) + " z end: " + str(z_end))
             print("z: " + str(z))
-            return [[xmin, xmax], [ymin, ymax], z, self.sumImageCube]
+            return [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube]
         except ValueError:
             print('One of your inputs is not a number')
 

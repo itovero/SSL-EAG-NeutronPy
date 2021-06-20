@@ -107,8 +107,8 @@ class Spectrum(QtWidgets.QWidget):
             self.figure.clear()
             ax3 = canvas.figure.subplots()
             #The plotting function itself
-            x = [i for i in range(0, len(self.imageviewer.files))]
-            y = [sumdata[i] for i in x]
+            x = [i for i in range(self.z_start, self.z_end)]
+            y = [sumdata[i - self.z_start] for i in x]
             ax3.plot(x, y, 'r.-')
             ax3.set_title('Cross Section (MeV vs Barns)')
             canvas.draw_idle()
@@ -227,14 +227,17 @@ class Spectrum(QtWidgets.QWidget):
         '''
 
         '''IMAGEVIEWER INPUT'''
-        self.imageviewerInput = self.imageviewer.saveInput() #imageviwerInput = [[xmin, xmax], [ymin, ymax], z, sum_image_data]
+        self.imageviewerInput = self.imageviewer.saveInput() #imageviwerInput = [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube]
 
         self.xmin = self.imageviewerInput[0][0]
         self.xmax = self.imageviewerInput[0][1]
         self.ymin = self.imageviewerInput[1][0]
         self.ymax = self.imageviewerInput[1][1]
-        self.z = self.imageviewerInput[2]
-        self.sum_image_data = self.imageviewerInput[3]
+        self.z_start = self.imageviewerInput[2][0]
+        self.z_end = self.imageviewerInput[2][1]
+        self.z = self.imageviewerInput[3]
+        self.backcoef = self.imageviewerInput[4]
+        self.sum_image_data = self.imageviewerInput[5]
 
 
 
