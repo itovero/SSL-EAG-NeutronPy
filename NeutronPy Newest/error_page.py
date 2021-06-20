@@ -13,10 +13,11 @@ class Error(QWidget):
         vbox = QVBoxLayout()
         self.label = QLabel(error)
         self.label.setAlignment(Qt.AlignCenter)
-        self.label.setFont(QFont("Times", 11, QtGui.QFont.Bold))
+        self.label.setFont(QFont("Times", 10))
         vbox.addWidget(self.label)
         self.setLayout(vbox)
-        self.resize(500, 100)
+        self.resize(300, 60)
+        self.setWindowModality(Qt.ApplicationModal)
         self.show()
 
 if __name__ == "__main__":

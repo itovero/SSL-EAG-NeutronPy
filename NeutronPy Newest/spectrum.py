@@ -107,7 +107,7 @@ class Spectrum(QtWidgets.QWidget):
             self.figure.clear()
             ax3 = canvas.figure.subplots()
             #The plotting function itself
-            x = [i for i in range(0, len(self.imageviewer.files) - 1)] #len(self.imageviewer.files)
+            x = [i for i in range(0, len(self.imageviewer.files))]
             y = [sumdata[i] for i in x]
             ax3.plot(x, y, 'r.-')
             ax3.set_title('Cross Section (MeV vs Barns)')

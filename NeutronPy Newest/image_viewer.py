@@ -176,8 +176,15 @@ class ImageViewerWindow(QWidget):
 
         #Load button: Opens directory selection for Sample Data
         self.loadopenbeam_button = QToolButton(self)
-        self.loadopenbeam_button.setText('Select Open Beam Data')
+        self.loadopenbeam_button.setText('Select OpenBeam Data')
         self.loadopenbeam_button.clicked.connect(self.loadopenbeam_dir)
+
+        #Backcoef value
+        self.backcoef_label = QLabel("Backcoef")
+        self.backcoef = QSpinBox()
+        self.backcoef.valueChanged.connect(self.update_backcoef)
+
+
 
         #Coordinates of the selection rectangle and their labels
         self.x_min_label = QLabel("X Min")
@@ -192,10 +199,17 @@ class ImageViewerWindow(QWidget):
         self.y_max_label = QLabel("Y Max")
         self.y_max = QSpinBox()
 
-        self.z_label = QLabel("Z")
+        self.z_start_label = QLabel("Z Start")
+        self.z_start = QSpinBox()
+
+        self.z_end_label = QLabel("Z End")
+        self.z_end = QSpinBox()
+    
+
+        self.z_label = QLabel("Current Z")
         self.z = QSpinBox() #TODO: The spinbox for the z value does not seem to update; the z-scrollbar works though
         self.z.setMinimum(0)
-        self.z.valueChanged.connect(self.load_new_image_z)
+        self.z.valueChanged.connect(self.load_new_image_z) #Update values of current z based on the changes on the viewer
 
         #Update values based on changes in both the viewer and the spinboxes
         self.viewer.rect_sig.connect(self.update_xy)
@@ -203,6 +217,11 @@ class ImageViewerWindow(QWidget):
         self.y_min.valueChanged.connect(self.update_rect)
         self.x_max.valueChanged.connect(self.update_rect)
         self.y_max.valueChanged.connect(self.update_rect)
+
+        #Update values of z start and z end
+        self.z_start.setValue(0)
+        self.z_start.valueChanged.connect(self.update_zrange)
+        self.z_end.valueChanged.connect(self.update_zrange)
 
         #Contrast Slider
         self.slider_label = QLabel("Contrast")
@@ -225,26 +244,66 @@ class ImageViewerWindow(QWidget):
         VB = QVBoxLayout(self)
         VB.addWidget(self.viewer)
         VB.addWidget(self.scroll_bar)
- 
-        #Add the coordinates and the get file button
+
+        #Add the buttons to select file and backcoef 
+        fileSelectRow = QHBoxLayout(self)
+
+        fileLayout = QGridLayout(self)
+        fileLayout.setAlignment(Qt.AlignLeft)
+        fileLayout.addWidget(self.loadsample_button, 1, 0)
+        fileLayout.addWidget(self.loadopenbeam_button, 2, 0)
+        fileSelectRow.addLayout(fileLayout, 10) 
+
+        CoefLayout = QGridLayout(self)
+        CoefLayout.addWidget(self.backcoef_label, 1, 0)
+        CoefLayout.addWidget(self.backcoef, 2, 0)
+        fileSelectRow.addLayout(CoefLayout, 5) 
+
+        CurrentzLayout = QGridLayout(self)
+        CurrentzLayout.addWidget(self.z_label, 1, 0)
+        CurrentzLayout.addWidget(self.z, 2, 0)
+        fileSelectRow.addLayout(CurrentzLayout, 5)
+
+        #Add the coordinates
         HB = QVBoxLayout(self)
-        HB.setAlignment(Qt.AlignLeft)
-        HB.addWidget(self.loadsample_button)
-        HB.addWidget(self.loadopenbeam_button)
-        HB.addWidget(self.x_min_label)
-        HB.addWidget(self.x_min)
-        HB.addWidget(self.x_max_label)
-        HB.addWidget(self.x_max)
-        HB.addWidget(self.y_min_label)
-        HB.addWidget(self.y_min)
-        HB.addWidget(self.y_max_label)
-        HB.addWidget(self.y_max)
-        HB.addWidget(self.z_label)
-        HB.addWidget(self.z)
+
+        xlabelLayout = QHBoxLayout(self)
+        xlabelLayout.addWidget(self.x_min_label, 50)
+        xlabelLayout.addWidget(self.x_max_label, 50)
+        xLayout = QHBoxLayout(self)
+        xLayout.addWidget(self.x_min, 50)
+        xLayout.addWidget(self.x_max, 50)
+        ylabelLayout = QHBoxLayout(self)
+        ylabelLayout.addWidget(self.y_min_label, 50)
+        ylabelLayout.addWidget(self.y_max_label, 50)
+        yLayout = QHBoxLayout(self)
+        yLayout.addWidget(self.y_min, 50)
+        yLayout.addWidget(self.y_max, 50)
+        zlabelLayout = QHBoxLayout(self)
+        zlabelLayout.addWidget(self.z_start_label, 50)
+        zlabelLayout.addWidget(self.z_end_label, 50)
+        zLayout = QHBoxLayout(self)
+        zLayout.addWidget(self.z_start, 50)
+        zLayout.addWidget(self.z_end, 50)
+        HB.addLayout(xlabelLayout)
+        HB.addLayout(xLayout)
+        HB.addLayout(ylabelLayout)
+        HB.addLayout(yLayout)
+        HB.addLayout(zlabelLayout)
+        HB.addLayout(zLayout)
+        
+        
         HB.addWidget(self.slider_label)
         HB.addWidget(self.slider)
-        layout.addLayout(VB)
+        
+        
+
+
+        layout.addLayout(VB) #NOTE: In case if you're wondering where the "QLayout: Attempting to add QLayout "" to ImageViewerWindow "", which already has a layout" error is happening, it's these three lines of layout.addLayout. I (Yuki) haven't really found a way to remove this but it seems to override it so it should be non-problematic.
+        layout.addLayout(fileSelectRow)
         layout.addLayout(HB)
+
+
     
     def loadsample_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(self, "Select Sample Data Directory"))
@@ -255,6 +314,14 @@ class ImageViewerWindow(QWidget):
             self.scroll_bar.setMaximum(len(self.files) - 1)
             self.z.setMaximum(len(self.files) - 1)
             self.load_new_image(0)
+
+            #Initialize z range ranges
+            self.z_start.setValue(0)
+            self.z_end.setMaximum(len(self.files) - 1)
+            self.z_end.setValue(len(self.files) - 1)
+            self.z_start.setMinimum(0)
+            self.z_start.setMaximum(self.z_end.value() - 1)
+            self.z_end.setMinimum(self.z_start.value() + 1)
 
 
             #instantiate the image cube!
@@ -321,6 +388,7 @@ class ImageViewerWindow(QWidget):
             """
             def compressed_load_data():
             """
+
 
     def loadopenbeam_dir(self): #Almost identical to sample data file select therefore many comments are omitted
         self.beam_dir = str(QFileDialog.getExistingDirectory(self, "Select OpenBeam Directory"))
@@ -411,13 +479,25 @@ class ImageViewerWindow(QWidget):
         self.viewer.update_rect()
         return [self.x_min.value(), self.x_max.value(), self.y_min.value(), self.y_max.value()]
 
+    def update_backcoef(self):
+        return self.backcoef.value()
+
+    def update_zrange(self):
+        return [self.z_start.value(), self.z_end.value()]
+
 
     #Save Input function for main.py integration
     def saveInput(self):
 
         try:
+            #backcoef
+            backcoef = self.update_backcoef()
+
             #z : SliceNum
             z = float(self.scroll_bar.value())
+
+            #z range
+            z_start, z_end = self.update_zrange()
             
             #xmin, xmax are the x coordinates of the rectangle user selected; same goes for y
             xmin, xmax, ymin, ymax = self.update_rect()
@@ -439,8 +519,10 @@ class ImageViewerWindow(QWidget):
             
             #These print statements are here for whenever you want to see if the inputs are actually updating when you click on the plots in spectrum
             #Can comment out if needed
+            print("backcoef: " + str(backcoef))
             print("xmin: " + str(xmin) + " xmax: " + str(xmax))
             print("ymin: " + str(ymin) + " ymax: " + str(ymax))
+            print("z start: " + str(z_start) + " z end: " + str(z_end))
             print("z: " + str(z))
             return [[xmin, xmax], [ymin, ymax], z, self.sumImageCube]
         except ValueError:
@@ -452,6 +534,6 @@ class ImageViewerWindow(QWidget):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = ImageViewerWindow()
-    w.setGeometry(0, 0, 800, 600)
+    w.setGeometry(100, 100, 800, 800)
     w.show()
     sys.exit(app.exec_())
