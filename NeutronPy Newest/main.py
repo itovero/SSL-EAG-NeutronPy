@@ -28,14 +28,14 @@ class MainWindow(QtWidgets.QMainWindow):
         imageviewer = ImageViewerWindow()
         spectrum = Spectrum(beamline, materials, imageviewer)
         #Defining where these instances go on the grid
-        layout.addWidget(beamline, 0, 4, 1, 1)
+        layout.addWidget(beamline, 0, 4, 2, 1)
         layout.addWidget(materials, 2, 2, 1, 3)
         layout.addWidget(spectrum, 0, 2, 2, 2)
         layout.addWidget(imageviewer, 0, 0, 3, 2)
 
         #Preset height and width
-        height = 800
-        width = 1550
+        height = 900
+        width = 1600
         self.setMinimumSize(width, height)
 
 

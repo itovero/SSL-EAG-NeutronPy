@@ -2,6 +2,10 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pandas as pd
 import numpy as np
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from os import listdir, path
 
 class Materials(QtWidgets.QWidget):
     def __init__(self):
@@ -110,6 +114,21 @@ class Materials(QtWidgets.QWidget):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setItem(4, 6, item)
 
+        #Load materials from file
+        self.loadmat_button = QToolButton(self)
+        self.loadmat_button.setText('Load Materials')
+        self.loadmat_button.clicked.connect(self.loadmat_file)
+        self.loadmat_button.move(5, 210)
+        self.label = QtWidgets.QLabel(self)
+        self.label.move(130, 212)
+        self.label.setText('None Selected')
+
+        #Save materials
+        self.savemat_button = QToolButton(self)
+        self.savemat_button.setText('Save Materials')
+        self.savemat_button.clicked.connect(self.savemat_file)
+        self.savemat_button.move(5, 240)
+
         self.retranslateUi(QtWidgets.QWidget())
 
         self.show()
@@ -215,8 +234,9 @@ class Materials(QtWidgets.QWidget):
         item = self.tableWidget.item(4, 5)
         item.setText(_translate("integrated", " "))
         item = self.tableWidget.item(4, 6)
-        item.setText(_translate("integrated", ""))
+        item.setText(_translate("integrated", " "))
         self.tableWidget.setSortingEnabled(__sortingEnabled)
+
 
     #returns a 2D pandas frame containing al of the table's values
     def saveInput(self):
@@ -236,6 +256,101 @@ class Materials(QtWidgets.QWidget):
                 new_frame.loc[i, j] = value
         print(new_frame)
         return new_frame
+
+    def loadmat_file(self):
+        self.selectedFile = QFileDialog.getOpenFileName(self, "Load Characteristics")
+        if path.isfile(self.selectedFile[0]): 
+            pathArr = self.selectedFile[0].split('/')
+            self.label.setText(pathArr[-1])
+            file = open(self.selectedFile[0], 'r')
+            fileString = file.read()
+            textArr = fileString.split('/')
+
+            _translate = QtCore.QCoreApplication.translate
+            item = self.tableWidget.item(0, 0)
+            item.setText(_translate("integrated", textArr[0]))
+            item = self.tableWidget.item(0, 1)
+            item.setText(_translate("integrated", textArr[1]))
+            item = self.tableWidget.item(0, 2)
+            item.setText(_translate("integrated", textArr[2]))
+            item = self.tableWidget.item(0, 3)
+            item.setText(_translate("integrated", textArr[3]))
+            item = self.tableWidget.item(0, 4)
+            item.setText(_translate("integrated", textArr[4]))
+            item = self.tableWidget.item(0, 5)
+            item.setText(_translate("integrated", textArr[5]))
+            item = self.tableWidget.item(0, 6)
+            item.setText(_translate("integrated", textArr[6]))
+            item = self.tableWidget.item(1, 0)
+            item.setText(_translate("integrated", textArr[7]))
+            item = self.tableWidget.item(1, 1)
+            item.setText(_translate("integrated", textArr[8]))
+            item = self.tableWidget.item(1, 2)
+            item.setText(_translate("integrated", textArr[9]))
+            item = self.tableWidget.item(1, 3)
+            item.setText(_translate("integrated", textArr[10]))
+            item = self.tableWidget.item(1, 4)
+            item.setText(_translate("integrated", textArr[11]))
+            item = self.tableWidget.item(1, 5)
+            item.setText(_translate("integrated", textArr[12]))
+            item = self.tableWidget.item(1, 6)
+            item.setText(_translate("integrated", textArr[13]))
+            item = self.tableWidget.item(2, 0)
+            item.setText(_translate("integrated", textArr[14]))
+            item = self.tableWidget.item(2, 1)
+            item.setText(_translate("integrated", textArr[15]))
+            item = self.tableWidget.item(2, 2)
+            item.setText(_translate("integrated", textArr[16]))
+            item = self.tableWidget.item(2, 3)
+            item.setText(_translate("integrated", textArr[17]))
+            item = self.tableWidget.item(2, 4)
+            item.setText(_translate("integrated", textArr[18]))
+            item = self.tableWidget.item(2, 5)
+            item.setText(_translate("integrated", textArr[19]))
+            item = self.tableWidget.item(2, 6)
+            item.setText(_translate("integrated", textArr[20]))
+            item = self.tableWidget.item(3, 0)
+            item.setText(_translate("integrated", textArr[21]))
+            item = self.tableWidget.item(3, 1)
+            item.setText(_translate("integrated", textArr[22]))
+            item = self.tableWidget.item(3, 2)
+            item.setText(_translate("integrated", textArr[23]))
+            item = self.tableWidget.item(3, 3)
+            item.setText(_translate("integrated", textArr[24]))
+            item = self.tableWidget.item(3, 4)
+            item.setText(_translate("integrated", textArr[25]))
+            item = self.tableWidget.item(3, 5)
+            item.setText(_translate("integrated", textArr[26]))
+            item = self.tableWidget.item(3, 6)
+            item.setText(_translate("integrated", textArr[27]))
+            item = self.tableWidget.item(4, 0)
+            item.setText(_translate("integrated", textArr[28]))
+            item = self.tableWidget.item(4, 1)
+            item.setText(_translate("integrated", textArr[29]))
+            item = self.tableWidget.item(4, 2)
+            item.setText(_translate("integrated", textArr[30]))
+            item = self.tableWidget.item(4, 3)
+            item.setText(_translate("integrated", textArr[31]))
+            item = self.tableWidget.item(4, 4)
+            item.setText(_translate("integrated", textArr[32]))
+            item = self.tableWidget.item(4, 5)
+            item.setText(_translate("integrated", textArr[33]))
+            item = self.tableWidget.item(4, 6)
+            item.setText(_translate("integrated", textArr[34]))
+
+    def savemat_file(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getSaveFileName(self,"Save Materials","","All Files (*);;Text Files (*.txt)", options=options)
+        if fileName:
+            file = open(fileName, 'w')
+            rows = self.tableWidget.rowCount()
+            columns = self.tableWidget.columnCount()
+            strList = []
+            for i in range(rows):
+                for j in range(columns):
+                    strList.append(self.tableWidget.item(i,j).text())
+            file.write('/'.join(strList))
+            file.close()
 
 if __name__ == "__main__":
     import sys

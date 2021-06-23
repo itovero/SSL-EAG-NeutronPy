@@ -6,6 +6,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import pandas as pd
 import numpy as np
+from os import listdir, path
+
 
 
 class Beamline(QtWidgets.QWidget):
@@ -16,7 +18,7 @@ class Beamline(QtWidgets.QWidget):
     #establish the layout of the beamline UI
     def initUI(self):
         self.groupBox_3 = QtWidgets.QGroupBox(self)
-        self.groupBox_3.setGeometry(QtCore.QRect(0, 0, 280, 241)) #set window size
+        self.groupBox_3.setGeometry(QtCore.QRect(0, 0, 280, 300)) #set window size
         self.groupBox_3.setObjectName("groupBox_3")
         self.label = QtWidgets.QLabel(self.groupBox_3)
         self.label.setGeometry(QtCore.QRect(10, 40, 101, 16))
@@ -42,6 +44,9 @@ class Beamline(QtWidgets.QWidget):
         self.label_8 = QtWidgets.QLabel(self.groupBox_3)
         self.label_8.setGeometry(QtCore.QRect(180, 190, 71, 16))
         self.label_8.setObjectName("label_8")
+        self.label_9 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_9.setGeometry(QtCore.QRect(140, 240, 120, 16))
+        self.label_9.setObjectName("label_9")
 
         #establish text input boxes
         self.length = QtWidgets.QLineEdit(self.groupBox_3)
@@ -61,6 +66,19 @@ class Beamline(QtWidgets.QWidget):
         self.maxE.setText("0")
         self.maxE.setObjectName("maxE")
 
+        #Load beamline characteristics from file
+        self.loadbeam_button = QToolButton(self)
+        self.loadbeam_button.setText('Load Characteristics')
+        self.loadbeam_button.clicked.connect(self.loadbeam_file)
+        self.loadbeam_button.move(5, 240)
+
+        #Save characteristics
+        self.savebeam_button = QToolButton(self)
+        self.savebeam_button.setText('Save Characteristics')
+        self.savebeam_button.clicked.connect(self.savebeam_file)
+        self.savebeam_button.move(5, 270)
+
+
         self.retranslateUi(QtWidgets.QWidget())
         self.show()
 
@@ -76,6 +94,36 @@ class Beamline(QtWidgets.QWidget):
         except ValueError:
             print('One of your inputs is not a number')
 
+    #load saved characteristics
+    def loadbeam_file(self):
+        self.selectedFile = QFileDialog.getOpenFileName(self, "Load Characteristics")
+        if path.isfile(self.selectedFile[0]): 
+            pathArr = self.selectedFile[0].split('/')
+            self.label_9.setText(pathArr[-1])
+            file = open(self.selectedFile[0], 'r')
+            fileString = file.read()
+            textArr = fileString.split(' ')
+            self.length.setText(textArr[0])
+            self.delay.setText(textArr[1])
+            self.minE.setText(textArr[2])
+            self.maxE.setText(textArr[3])
+
+    def savebeam_file(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getSaveFileName(self,"Save Characteristics","","All Files (*);;Text Files (*.txt)", options=options)
+        if fileName:
+            file = open(fileName, 'w')
+
+            flightPath = self.length.text()
+            delayOnTrigger = self.delay.text()
+            minimumEnergyRange = self.minE.text()
+            maximumEnergyRange = self.maxE.text()
+            text = flightPath + ' ' + delayOnTrigger + ' ' + minimumEnergyRange + ' ' + maximumEnergyRange
+
+            file.write(text)
+            file.close()
+
+
     #populate the labels created previously with text
     def retranslateUi(self, integrated):
         _translate = QtCore.QCoreApplication.translate
@@ -88,6 +136,7 @@ class Beamline(QtWidgets.QWidget):
         self.label_6.setText(_translate("deliverable", "milliseconds"))
         self.label_7.setText(_translate("deliverable", "electronvolt"))
         self.label_8.setText(_translate("deliverable", "electronvolt"))
+        self.label_9.setText(_translate("deliverable", "None Selected"))
         
 
 if __name__ == "__main__":
