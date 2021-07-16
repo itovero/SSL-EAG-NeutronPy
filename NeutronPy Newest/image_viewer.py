@@ -187,6 +187,7 @@ class ImageViewerWindow(QWidget):
         #Backcoef value
         self.backcoef_label = QLabel("Backcoef")
         self.backcoef = QSpinBox()
+        self.backcoef.setValue(1)
         self.backcoef.valueChanged.connect(self.update_backcoef)
 
 
@@ -212,9 +213,9 @@ class ImageViewerWindow(QWidget):
     
 
         self.z_label = QLabel("Current Z")
-        self.z = QSpinBox() #TODO: The spinbox for the z value does not seem to update; the z-scrollbar works though
+        self.z = QSpinBox()
         self.z.setMinimum(0)
-        self.z.valueChanged.connect(self.load_new_image_z) #Update values of current z based on the changes on the viewer
+        self.z.valueChanged.connect(self.load_new_image_z)
 
         #Update values based on changes in both the viewer and the spinboxes
         self.viewer.rect_sig.connect(self.update_xy)
@@ -499,6 +500,7 @@ class ImageViewerWindow(QWidget):
         return [self.x_min.value(), self.x_max.value(), self.y_min.value(), self.y_max.value()]
 
     def update_backcoef(self):
+        print(self.backcoef.value())
         return self.backcoef.value()
 
     def update_zrange(self):
@@ -523,7 +525,7 @@ class ImageViewerWindow(QWidget):
 
             def naive_sum_data(): 
                 try: #When we have both open beam data set and sample data image cube
-                    self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax] / (self.openbeam_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(z_start, z_end + 1)]
+                    self.sumImageCube = [backcoef * np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) / np.sum((self.openbeam_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(z_start, z_end + 1)]
                     #TODO: This runs into runtime warning of dividing by zero - fix that! Also add operations with normalization coef
 
                 except: #When we don't have an open beam data set
