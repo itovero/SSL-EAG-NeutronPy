@@ -107,10 +107,11 @@ class Spectrum(QtWidgets.QWidget):
             self.figure.clear()
             ax3 = canvas.figure.subplots()
             #The plotting function itself
-            x = [i for i in range(self.z_start, self.z_end)]
-            y = [sumdata[i - self.z_start] for i in x]
+            assert len(self.TOF) == len(self.sum_image_data), "the length of the TOF array and sum_image_data is inconsistent"
+            x = self.TOF
+            y = self.sum_image_data
             ax3.plot(x, y, 'r.-')
-            ax3.set_title('Cross Section (MeV vs Barns)')
+            ax3.set_title('Cross Section (TOF vs Barns)')
             canvas.draw_idle()
 
         try:
@@ -238,6 +239,7 @@ class Spectrum(QtWidgets.QWidget):
         self.z = self.imageviewerInput[3]
         self.backcoef = self.imageviewerInput[4]
         self.sum_image_data = self.imageviewerInput[5]
+        self.TOF = self.imageviewerInput[6]
 
 
 
