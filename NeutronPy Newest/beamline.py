@@ -18,7 +18,7 @@ class Beamline(QtWidgets.QWidget):
     #establish the layout of the beamline UI
     def initUI(self):
         self.groupBox_3 = QtWidgets.QGroupBox(self)
-        self.groupBox_3.setGeometry(QtCore.QRect(0, 0, 280, 300)) #set window size
+        self.groupBox_3.setGeometry(QtCore.QRect(0, 0, 280, 380)) #set window size
         self.groupBox_3.setObjectName("groupBox_3")
         self.label = QtWidgets.QLabel(self.groupBox_3)
         self.label.setGeometry(QtCore.QRect(10, 40, 101, 16))
@@ -44,9 +44,24 @@ class Beamline(QtWidgets.QWidget):
         self.label_8 = QtWidgets.QLabel(self.groupBox_3)
         self.label_8.setGeometry(QtCore.QRect(180, 190, 71, 16))
         self.label_8.setObjectName("label_8")
-        self.label_9 = QtWidgets.QLabel(self.groupBox_3)
-        self.label_9.setGeometry(QtCore.QRect(140, 240, 120, 16))
-        self.label_9.setObjectName("label_9")
+        #self.label_9 = QtWidgets.QLabel(self.groupBox_3)
+        #self.label_9.setGeometry(QtCore.QRect(140, 240, 120, 16))
+        #self.label_9.setObjectName("label_9")
+        self.label_10 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_10.setGeometry(QtCore.QRect(10, 240, 101, 16))
+        self.label_10.setObjectName("label_10")
+        self.label_11 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_11.setGeometry(QtCore.QRect(10, 290, 101, 16))
+        self.label_11.setObjectName("label_11")
+        self.label_12 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_12.setGeometry(QtCore.QRect(10, 340, 101, 16))
+        self.label_12.setObjectName("label_12")
+        self.label_13 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_13.setGeometry(QtCore.QRect(180, 240, 101, 16))
+        self.label_13.setObjectName("label_13")
+        self.label_14 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_14.setGeometry(QtCore.QRect(180, 290, 101, 16))
+        self.label_14.setObjectName("label_14")
 
         #establish text input boxes
         self.length = QtWidgets.QLineEdit(self.groupBox_3)
@@ -65,19 +80,31 @@ class Beamline(QtWidgets.QWidget):
         self.maxE.setGeometry(QtCore.QRect(120, 190, 51, 22))
         self.maxE.setText("0")
         self.maxE.setObjectName("maxE")
+        self.proton = QtWidgets.QLineEdit(self.groupBox_3)
+        self.proton.setGeometry(QtCore.QRect(120, 240, 51, 22))
+        self.proton.setText("0")
+        self.proton.setObjectName("proton")
+        self.timeBin = QtWidgets.QLineEdit(self.groupBox_3)
+        self.timeBin.setGeometry(QtCore.QRect(120, 290, 51, 22))
+        self.timeBin.setText("0")
+        self.timeBin.setObjectName("timeBin")
+        self.skipPoints = QtWidgets.QLineEdit(self.groupBox_3)
+        self.skipPoints.setGeometry(QtCore.QRect(120, 340, 51, 22))
+        self.skipPoints.setText("0")
+        self.skipPoints.setObjectName("skipPoints")
 
         #Load beamline characteristics from file
-        self.loadbeam_button = QToolButton(self)
-        self.loadbeam_button.setText('Load Characteristics')
-        self.loadbeam_button.clicked.connect(self.loadbeam_file)
-        self.loadbeam_button.move(5, 240)
+        #self.loadbeam_button = QToolButton(self)
+        #self.loadbeam_button.setText('Load Characteristics')
+        #self.loadbeam_button.clicked.connect(self.loadbeam_file)
+        #self.loadbeam_button.move(5, 240)
 
         #Save characteristics
         #TODO: Merge save method with materials.py and save with pandas
-        self.savebeam_button = QToolButton(self)
-        self.savebeam_button.setText('Save Characteristics')
-        self.savebeam_button.clicked.connect(self.savebeam_file)
-        self.savebeam_button.move(5, 270)
+        #self.savebeam_button = QToolButton(self)
+        #self.savebeam_button.setText('Save Characteristics')
+        #self.savebeam_button.clicked.connect(self.savebeam_file)
+        #self.savebeam_button.move(5, 270)
 
 
         self.retranslateUi(QtWidgets.QWidget())
@@ -90,39 +117,35 @@ class Beamline(QtWidgets.QWidget):
             delayOnTrigger = float(self.delay.text())
             minimumEnergyRange = float(self.minE.text())
             maximumEnergyRange = float(self.maxE.text())
-            print([flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]])
-            return [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange]]
+            protonPulseGap = float(self.proton.text())
+            timeBin = float(self.timeBin.text())
+            skipPoints = float(self.skipPoints.text())
+            print([flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange], protonPulseGap, timeBin, skipPoints])
+            return [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange], protonPulseGap, timeBin, skipPoints]
         except ValueError:
             print('One of your inputs is not a number')
 
-    #load saved characteristics
-    def loadbeam_file(self):
-        self.selectedFile = QFileDialog.getOpenFileName(self, "Load Characteristics")
-        if path.isfile(self.selectedFile[0]): 
-            pathArr = self.selectedFile[0].split('/')
-            self.label_9.setText(pathArr[-1])
-            file = open(self.selectedFile[0], 'r')
-            fileString = file.read()
-            textArr = fileString.split(' ')
-            self.length.setText(textArr[0])
-            self.delay.setText(textArr[1])
-            self.minE.setText(textArr[2])
-            self.maxE.setText(textArr[3])
+    def saveArray(self):
+        try:
+            flightPath = float(self.length.text())
+            delayOnTrigger = float(self.delay.text())
+            minimumEnergyRange = float(self.minE.text())
+            maximumEnergyRange = float(self.maxE.text())
+            protonPulseGap = float(self.proton.text())
+            timeBin = float(self.timeBin.text())
+            skipPoints = float(self.skipPoints.text())
+            return [flightPath, delayOnTrigger, minimumEnergyRange, maximumEnergyRange, protonPulseGap, timeBin, skipPoints]
+        except ValueError:
+            print('One of your inputs is not a number')
 
-    def savebeam_file(self):
-        options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getSaveFileName(self,"Save Characteristics","","All Files (*);;Text Files (*.txt)", options=options)
-        if fileName:
-            file = open(fileName, 'w')
-
-            flightPath = self.length.text()
-            delayOnTrigger = self.delay.text()
-            minimumEnergyRange = self.minE.text()
-            maximumEnergyRange = self.maxE.text()
-            text = flightPath + ' ' + delayOnTrigger + ' ' + minimumEnergyRange + ' ' + maximumEnergyRange
-
-            file.write(text)
-            file.close()
+    def update_inputs(self, pandasFrame):
+        self.length.setText(str(pandasFrame.iloc[5, 0]))
+        self.delay.setText(str(pandasFrame.iloc[5, 1]))
+        self.minE.setText(str(pandasFrame.iloc[5, 2]))
+        self.maxE.setText(str(pandasFrame.iloc[5, 3]))
+        self.proton.setText(str(pandasFrame.iloc[5, 4]))
+        self.timeBin.setText(str(pandasFrame.iloc[5, 5]))
+        self.skipPoints.setText(str(pandasFrame.iloc[5, 6]))
 
 
     #populate the labels created previously with text
@@ -134,10 +157,15 @@ class Beamline(QtWidgets.QWidget):
         self.label_3.setText(_translate("deliverable", "Minimum Energy"))
         self.label_4.setText(_translate("deliverable", "Maximum Energy"))
         self.label_5.setText(_translate("deliverable", "meters"))
-        self.label_6.setText(_translate("deliverable", "milliseconds"))
+        self.label_6.setText(_translate("deliverable", "microseconds"))
         self.label_7.setText(_translate("deliverable", "electronvolt"))
         self.label_8.setText(_translate("deliverable", "electronvolt"))
-        self.label_9.setText(_translate("deliverable", "None Selected"))
+        #self.label_9.setText(_translate("deliverable", "None Selected"))
+        self.label_10.setText(_translate("deliverable", "Proton Pulse Gap"))
+        self.label_11.setText(_translate("deliverable", "Time Bin"))
+        self.label_12.setText(_translate("deliverable", "Skip Points"))
+        self.label_13.setText(_translate("deliverable", "microseconds"))
+        self.label_14.setText(_translate("deliverable", "microseconds"))
         
 
 if __name__ == "__main__":

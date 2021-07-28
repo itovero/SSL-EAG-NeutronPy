@@ -1,6 +1,8 @@
 import sys, traceback
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 import pandas as pd
 from beamline import Beamline
 from image_viewer import ImageViewerWindow
@@ -91,6 +93,14 @@ class Spectrum(QtWidgets.QWidget):
         btn3 = QtWidgets.QPushButton('Converging Fit', self)
         btn3.clicked.connect(self.ConvergeFit)
         grid.addWidget(btn3, 5, 2)
+
+        btn4 = QtWidgets.QPushButton('Load Parameters', self)
+        btn4.clicked.connect(self.load_csv)
+        grid.addWidget(btn4, 6, 0)
+
+        btn5 = QtWidgets.QPushButton('Save Parameters', self)
+        btn5.clicked.connect(self.save_csv)
+        grid.addWidget(btn5, 6, 1)
 
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
@@ -280,6 +290,28 @@ class Spectrum(QtWidgets.QWidget):
         assert component >= 1
     
         """
+
+    def save_csv(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getSaveFileName(self,"Save Parameters","","All Files (*);;Text Files (*.txt)", options=options)
+        pandasFrame = self.materials.saveInput()
+        beamlineArray = self.beamline.saveArray()
+        pandasFrame.loc[5, 0] = beamlineArray[0]
+        pandasFrame.loc[5, 1] = beamlineArray[1]
+        pandasFrame.loc[5, 2] = beamlineArray[2]
+        pandasFrame.loc[5, 3] = beamlineArray[3]
+        pandasFrame.loc[5, 4] = beamlineArray[4]
+        pandasFrame.loc[5, 5] = beamlineArray[5]
+        pandasFrame.loc[5, 6] = beamlineArray[6]
+        pandasFrame.to_csv(fileName, index = False)
+
+    def load_csv(self):
+        options = QFileDialog.Options()
+        self.selectedFile = QFileDialog.getOpenFileName(self, "Load Characteristics")
+        pandasFrame = pd.read_csv(self.selectedFile[0])
+        #print(pandasFrame)
+        self.materials.update_table(pandasFrame)
+        self.beamline.update_inputs(pandasFrame)
 
 if __name__ == "__main__":
     import sys
