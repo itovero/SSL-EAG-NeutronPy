@@ -110,6 +110,7 @@ class Spectrum(QtWidgets.QWidget):
             x = [i for i in range(self.z_start, self.z_end)]
             y = [sumdata[i - self.z_start] for i in x]
             ax3.plot(x, y, 'r.-')
+            ax3.grid()
             ax3.set_title('Cross Section (MeV vs Barns)')
             canvas.draw_idle()
 

@@ -73,6 +73,7 @@ class Beamline(QtWidgets.QWidget):
         self.loadbeam_button.move(5, 240)
 
         #Save characteristics
+        #TODO: Merge save method with materials.py and save with pandas
         self.savebeam_button = QToolButton(self)
         self.savebeam_button.setText('Save Characteristics')
         self.savebeam_button.clicked.connect(self.savebeam_file)
