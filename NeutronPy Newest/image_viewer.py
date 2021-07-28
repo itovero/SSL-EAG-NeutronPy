@@ -191,7 +191,6 @@ class ImageViewerWindow(QWidget):
         self.backcoef.valueChanged.connect(self.update_backcoef)
 
 
-
         #Coordinates of the selection rectangle and their labels
         self.x_min_label = QLabel("X Min")
         self.x_min = QSpinBox()
@@ -337,7 +336,8 @@ class ImageViewerWindow(QWidget):
             self.z_end.setMinimum(self.z_start.value() + 1)
 
 
-            #instantiate the image cube!
+            #instantiate the TOF and image cube!
+            self.TOF = []
             self.image_cube = []
 
 
@@ -352,7 +352,13 @@ class ImageViewerWindow(QWidget):
                 fileLen = len(self.files)
                 for fileNum in range(0, fileLen):
                     with fits.open(self.dir + '/' + self.files[fileNum], memmap = True) as hdul:
+                        # if (fileNum == 0):
+                        #     self.N_trigger = hdul[0].header["N_TRIGS"]
+                        # else:
+                        #     print(fileNum)
+                        #     assert self.N_trigger == hdul[0].header["N_TRIGS"], "Number of triggers inconsistent within sample data"
                         self.image_cube.append(hdul[0].data)
+                        self.TOF.append(hdul[0].header["TOF"])
                         del hdul[0].data
                         if (fileNum - 1) * 100 // fileLen  != fileNum * 100 // fileLen:
                             progress_callback.emit(fileNum / fileLen * 100, 1, 0)
@@ -408,6 +414,7 @@ class ImageViewerWindow(QWidget):
 
         if path.isdir(self.beam_dir): 
             self.beam_files = listdir(self.beam_dir)
+            self.openbeam_TOF = []
             self.openbeam_image_cube = []
 
             pathArr = self.beam_dir.split('/')
@@ -422,6 +429,7 @@ class ImageViewerWindow(QWidget):
                 fileLen = len(self.beam_files)
                 for fileNum in range(0, fileLen):
                     with fits.open(self.beam_dir + '/' + self.beam_files[fileNum], memmap = True) as hdul:
+                        self.openbeam_TOF.append(hdul[0].header["TOF"])
                         self.openbeam_image_cube.append(hdul[0].data)
                         del hdul[0].data
                         if (fileNum - 1) * 100 // fileLen  != fileNum * 100 // fileLen:
@@ -500,7 +508,7 @@ class ImageViewerWindow(QWidget):
         return [self.x_min.value(), self.x_max.value(), self.y_min.value(), self.y_max.value()]
 
     def update_backcoef(self):
-        print(self.backcoef.value())
+        #print(self.backcoef.value())
         return self.backcoef.value()
 
     def update_zrange(self):
@@ -508,8 +516,7 @@ class ImageViewerWindow(QWidget):
 
 
     #Save Input function for main.py integration
-    def saveInput(self): #returns = [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube]
-
+    def saveInput(self): #returns = [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube, self.TOF]
         try:
             #backcoef
             backcoef = self.update_backcoef()
@@ -527,6 +534,7 @@ class ImageViewerWindow(QWidget):
                 try: #When we have both open beam data set and sample data image cube
                     self.sumImageCube = [backcoef * np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) / np.sum((self.openbeam_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(z_start, z_end + 1)]
                     #TODO: This runs into runtime warning of dividing by zero - fix that! Also add operations with normalization coef
+                    assert self.TOF == self.openbeam_TOF, "The TOFs between the openbeam and the sample data is inconsistent! "
 
                 except: #When we don't have an open beam data set
                     #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
@@ -545,7 +553,7 @@ class ImageViewerWindow(QWidget):
             print("ymin: " + str(ymin) + " ymax: " + str(ymax))
             print("z start: " + str(z_start) + " z end: " + str(z_end))
             print("z: " + str(z))
-            return [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube]
+            return [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube, self.TOF]
         except ValueError:
             print('One of your inputs is not a number')
 
