@@ -25,7 +25,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #TODO: Robustness to create new separate main windows for other imaging experiments
         beamline = Beamline()
         materials = Materials()
-        imageviewer = ImageViewerWindow()
+        imageviewer = ImageViewerWindow(beamline)
         spectrum = Spectrum(beamline, materials, imageviewer)
         #Defining where these instances go on the grid
         layout.addWidget(beamline, 0, 4, 2, 1)

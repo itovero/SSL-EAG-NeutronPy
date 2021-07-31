@@ -66,11 +66,11 @@ class Beamline(QtWidgets.QWidget):
         #establish text input boxes
         self.length = QtWidgets.QLineEdit(self.groupBox_3)
         self.length.setGeometry(QtCore.QRect(120, 40, 51, 22))
-        self.length.setText("0")
+        self.length.setText("16.4")
         self.length.setObjectName("length")
         self.delay = QtWidgets.QLineEdit(self.groupBox_3)
         self.delay.setGeometry(QtCore.QRect(120, 90, 51, 22))
-        self.delay.setText("0")
+        self.delay.setText("3.6")
         self.delay.setObjectName("delay")
         self.minE = QtWidgets.QLineEdit(self.groupBox_3)
         self.minE.setGeometry(QtCore.QRect(120, 140, 51, 22))
@@ -120,7 +120,7 @@ class Beamline(QtWidgets.QWidget):
             protonPulseGap = float(self.proton.text())
             timeBin = float(self.timeBin.text())
             skipPoints = float(self.skipPoints.text())
-            print([flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange], protonPulseGap, timeBin, skipPoints])
+            #print([flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange], protonPulseGap, timeBin, skipPoints])
             return [flightPath, delayOnTrigger, [minimumEnergyRange, maximumEnergyRange], protonPulseGap, timeBin, skipPoints]
         except ValueError:
             print('One of your inputs is not a number')

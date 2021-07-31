@@ -13,6 +13,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from progress_bar import Progress
 
+from beamline import Beamline
+from TransmissionCalc import Get_E_FromTOF
+
 class selector(QRubberBand):
     def __init__(self, *arg, **kwargs):
         super().__init__(*arg, **kwargs)
@@ -163,8 +166,14 @@ class image_viewer(QGraphicsView):
     #     self.scene.addWidget(QLabel(sampleFileName + "          Open Beam:"  + openBeamDirectory))
 
 class ImageViewerWindow(QWidget):
-    def __init__(self):
+    def __init__(self, beamline):
         super().__init__()
+
+        #Load main's instance of beamline
+        self.beamline = beamline
+        self.flightpath = self.beamline.saveInput()[0]
+        self.delayontrigger = self.beamline.saveInput()[1]
+
         #For multi-threading data loadout
         self.threadpool = QThreadPool()
 
@@ -184,11 +193,11 @@ class ImageViewerWindow(QWidget):
         self.loadopenbeam_button.clicked.connect(self.loadopenbeam_dir)
         self.openbeamdirnamelabel = QLabel("None Selected")
 
-        #Backcoef value
-        self.backcoef_label = QLabel("Backcoef")
-        self.backcoef = QSpinBox()
-        self.backcoef.setValue(1)
-        self.backcoef.valueChanged.connect(self.update_backcoef)
+        # #Backcoef value
+        # self.backcoef_label = QLabel("Backcoef")
+        # self.backcoef = QDoubleSpinBox()
+        # self.backcoef.setValue(0)
+        # self.backcoef.valueChanged.connect(self.update_backcoef)
 
 
         #Coordinates of the selection rectangle and their labels
@@ -215,6 +224,7 @@ class ImageViewerWindow(QWidget):
         self.z = QSpinBox()
         self.z.setMinimum(0)
         self.z.valueChanged.connect(self.load_new_image_z)
+
 
         #Update values based on changes in both the viewer and the spinboxes
         self.viewer.rect_sig.connect(self.update_xy)
@@ -261,10 +271,10 @@ class ImageViewerWindow(QWidget):
         fileLayout.addWidget(self.openbeamdirnamelabel, 2, 1)
         fileSelectRow.addLayout(fileLayout, 60) 
 
-        CoefLayout = QGridLayout(self)
-        CoefLayout.addWidget(self.backcoef_label, 1, 0)
-        CoefLayout.addWidget(self.backcoef, 2, 0)
-        fileSelectRow.addLayout(CoefLayout, 5) 
+        # CoefLayout = QGridLayout(self)
+        # CoefLayout.addWidget(self.backcoef_label, 1, 0)
+        # CoefLayout.addWidget(self.backcoef, 2, 0)
+        # fileSelectRow.addLayout(CoefLayout, 5) 
 
         CurrentzLayout = QGridLayout(self)
         CurrentzLayout.addWidget(self.z_label, 1, 0)
@@ -339,6 +349,7 @@ class ImageViewerWindow(QWidget):
             #instantiate the TOF and image cube!
             self.TOF = []
             self.image_cube = []
+            self.Ntrigs = []
 
 
             #loads every image file in the directory into an image cube containing information
@@ -359,6 +370,7 @@ class ImageViewerWindow(QWidget):
                         #     assert self.N_trigger == hdul[0].header["N_TRIGS"], "Number of triggers inconsistent within sample data"
                         self.image_cube.append(hdul[0].data)
                         self.TOF.append(hdul[0].header["TOF"])
+                        self.Ntrigs.append(hdul[0].header["N_TRIGS"])
                         del hdul[0].data
                         if (fileNum - 1) * 100 // fileLen  != fileNum * 100 // fileLen:
                             progress_callback.emit(fileNum / fileLen * 100, 1, 0)
@@ -416,6 +428,7 @@ class ImageViewerWindow(QWidget):
             self.beam_files = listdir(self.beam_dir)
             self.openbeam_TOF = []
             self.openbeam_image_cube = []
+            self.openbeam_Ntrigs = []
 
             pathArr = self.beam_dir.split('/')
             self.openbeamdirnamelabel.setText(pathArr[-1])
@@ -430,6 +443,7 @@ class ImageViewerWindow(QWidget):
                 for fileNum in range(0, fileLen):
                     with fits.open(self.beam_dir + '/' + self.beam_files[fileNum], memmap = True) as hdul:
                         self.openbeam_TOF.append(hdul[0].header["TOF"])
+                        self.openbeam_Ntrigs.append(hdul[0].header["N_TRIGS"])
                         self.openbeam_image_cube.append(hdul[0].data)
                         del hdul[0].data
                         if (fileNum - 1) * 100 // fileLen  != fileNum * 100 // fileLen:
@@ -507,9 +521,8 @@ class ImageViewerWindow(QWidget):
         self.viewer.update_rect()
         return [self.x_min.value(), self.x_max.value(), self.y_min.value(), self.y_max.value()]
 
-    def update_backcoef(self):
-        #print(self.backcoef.value())
-        return self.backcoef.value()
+    # def update_backcoef(self):
+    #     return self.backcoef.value()
 
     def update_zrange(self):
         return [self.z_start.value(), self.z_end.value()]
@@ -519,7 +532,7 @@ class ImageViewerWindow(QWidget):
     def saveInput(self): #returns = [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube, self.TOF]
         try:
             #backcoef
-            backcoef = self.update_backcoef()
+            #backcoef = self.update_backcoef()
 
             #z : SliceNum
             z = float(self.scroll_bar.value())
@@ -530,12 +543,25 @@ class ImageViewerWindow(QWidget):
             #xmin, xmax are the x coordinates of the rectangle user selected; same goes for y
             xmin, xmax, ymin, ymax = self.update_rect()
 
+            #update beamline params
+            self.flightpath = self.beamline.saveInput()[0]
+            self.delayontrigger = self.beamline.saveInput()[1]
+
+            #account TOF with the delay on trigger
+            self.TOF = np.array(self.TOF)
+            self.TOF += self.delayontrigger
+
+            #load the E array from the TOF values
+            self.E = Get_E_FromTOF(self.TOF, self.flightpath)
+
             def naive_sum_data(): 
                 try: #When we have both open beam data set and sample data image cube
-                    self.sumImageCube = [backcoef * np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) / np.sum((self.openbeam_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(z_start, z_end + 1)]
+                    backcoef = np.array(self.openbeam_Ntrigs) / np.array(self.Ntrigs)
+                    backcoef = np.array(backcoef)
+                    self.sumImageCube = [backcoef[sliceNum] * np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) / np.sum((self.openbeam_image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(z_start, z_end + 1)]
                     #TODO: This runs into runtime warning of dividing by zero - fix that! Also add operations with normalization coef
                     assert self.TOF == self.openbeam_TOF, "The TOFs between the openbeam and the sample data is inconsistent! "
-
+                    
                 except: #When we don't have an open beam data set
                     #sumImageCube is the sum of all the pixel values of the rectangle you selected for all the slices in the image_cube you created when selecting the directory
                     self.sumImageCube = [np.sum((self.image_cube[sliceNum])[ymin:ymax, xmin:xmax]) for sliceNum in range(z_start, z_end + 1)]
@@ -548,12 +574,12 @@ class ImageViewerWindow(QWidget):
             
             #These print statements are here for whenever you want to see if the inputs are actually updating when you click on the plots in spectrum
             #Can comment out if needed
-            print("backcoef: " + str(backcoef))
+            #print("backcoef: " + str(backcoef))
             print("xmin: " + str(xmin) + " xmax: " + str(xmax))
             print("ymin: " + str(ymin) + " ymax: " + str(ymax))
             print("z start: " + str(z_start) + " z end: " + str(z_end))
             print("z: " + str(z))
-            return [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, backcoef, self.sumImageCube, self.TOF]
+            return [[xmin, xmax], [ymin, ymax], [z_start, z_end], z, [], self.sumImageCube, self.TOF, self.E]
         except ValueError:
             print('One of your inputs is not a number')
 
